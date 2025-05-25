@@ -109,12 +109,56 @@ p1 + p2
 summary(model)
 
 
+# Activation Functions ----------------------------------------------------
+
+sigmoid <- function(x) {
+  return(1 / (1 + exp(-x)))
+}
+
+ReLU <- function(x) {
+  return(pmax(0, x))
+}
+
+Softplus <- function(x) {
+  return(log(1 + exp(x)))
+}
+
+# LReLU
+# ELU
+# PReLU
+
+
+# Data --------------------------------------------------------------------
+
+random_split <- function(data, split=c(0.8, 0.2)) {
+  split <- match.arg(split)
+  
+  n <- nrow(data)
+  train_indices <- sample(1:n, size = floor(n * split[1]))
+  
+  train_data <- data[train_indices, ]
+  test_data <- data[-train_indices, ]
+  
+  return(list(train = train_data, test = test_data))
+}
+
+DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
+  if (shuffle) {
+    data <- data[sample(nrow(data)), ]
+  }
+  
+  n <- nrow(data)
+  batches <- split(data, rep(1:ceiling(n / batch_size), each=batch_size, length.out=n))
+  
+  return(batches)
+}
+
 
 #  NNet -------------------------------------------------------------------
 
 # shuffel data set (X and y)
+# scale X
 # create 80/20 train/test split of data set
-# scale X_train and X_test
 # convert X and y to matrices and transpose
 
 getLayerSize <- function(X, y, hidden_neurons, train=TRUE) {
@@ -128,3 +172,6 @@ getLayerSize <- function(X, y, hidden_neurons, train=TRUE) {
   
   return(size)
 }
+
+
+
