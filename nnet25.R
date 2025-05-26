@@ -131,16 +131,48 @@ Softplus <- function(x) {
 # Data --------------------------------------------------------------------
 
 random_split <- function(data, split=c(0.8, 0.2)) {
-  split <- match.arg(split)
   
-  n <- nrow(data)
-  train_indices <- sample(1:n, size = floor(n * split[1]))
+  # 1) Typ / Länge prüfen
+  if (!is.numeric(split) || length(split) != 2) {
+    stop("`split` muss ein numerischer Vektor der Länge 2 sein, z.B. c(0.8, 0.2).")
+  }
+  # 2) Wertebereich prüfen
+  if (any(split < 0) || any(split > 1)) {
+    stop("Alle Einträge in `split` müssen zwischen 0 und 1 liegen.")
+  }
+  # 3) Summe prüfen
+  if (sum(split) > 1) {
+    stop("Die Summe von `split` darf maximal 1.0 sein (du hast ", sum(split), ").")
+  }
   
-  train_data <- data[train_indices, ]
-  test_data <- data[-train_indices, ]
+  n      <- nrow(data)
+  n_train <- floor(split[1] * n)
+  n_test  <- floor(split[2] * n) # oder besser 1-n_train
   
-  return(list(train = train_data, test = test_data))
+  # ohne shuffle
+  train <- data[1:n_train, , drop = FALSE]
+  test <- data[(n_train + 1):n, , drop = FALSE]
+  
+  # "shuffled" schon die daten
+  # train <- sample(n, n_train)
+  # test  <- sample(setdiff(seq_len(n), train), n_test)
+  
+  # return(list(
+  #   train = data[train, , drop = FALSE],
+  #   test  = data[test,  , drop = FALSE]
+  # ))
+  return(list(
+    train = train,
+    test  = test
+  ))
 }
+
+
+datensplit <- random_split(abdom)
+
+train <- datensplit$train
+test <- datensplit$test
+
 
 DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
   if (shuffle) {
@@ -148,10 +180,20 @@ DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
   }
   
   n <- nrow(data)
-  batches <- split(data, rep(1:ceiling(n / batch_size), each=batch_size, length.out=n))
+  # Start-Indizes der Batches: 1, 1+batch_size, 1+2*batch_size, …
+  starts <- seq(1, n, by = batch_size)
   
+  # Für jeden Start einen kleinen Data Frame erzeugen
+  batches <- lapply(starts, function(i) {
+    data[i : min(i + batch_size - 1, n), , drop = FALSE]
+  })
+    
   return(batches)
 }
+
+train_loader <- DataLoader(datensplit$train)
+
+train_loader
 
 
 #  NNet -------------------------------------------------------------------
