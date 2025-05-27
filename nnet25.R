@@ -123,6 +123,10 @@ Softplus <- function(x) {
   return(log(1 + exp(x)))
 }
 
+ELU <- function(x, alpha = 1) {
+  return(ifelse(x > 0, x, alpha * (exp(x) - 1)))
+}
+
 # LReLU
 # ELU
 # PReLU
