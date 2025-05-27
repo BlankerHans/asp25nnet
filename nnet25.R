@@ -175,8 +175,11 @@ test <- datensplit$test
 
 
 DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
+  
+  data <- as.matrix(data)
+  
   if (shuffle) {
-    data <- data[sample(nrow(data)), ]
+    data <- data[sample(nrow(data)), , drop = FALSE]
   }
   
   n <- nrow(data)
@@ -185,15 +188,30 @@ DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
   
   # Für jeden Start einen kleinen Data Frame erzeugen
   batches <- lapply(starts, function(i) {
-    data[i : min(i + batch_size - 1, n), , drop = FALSE]
+    mat <- data[i:min(i+batch_size-1, n), , drop = FALSE]
+    mat_t <- t(mat)
+    idx   <- as.integer(colnames(mat_t))
+    list(
+      batch   = mat_t,
+      idx = idx
+    )
   })
     
   return(batches)
 }
 
+batch_size <- 32
+
 train_loader <- DataLoader(datensplit$train)
 
-train_loader
+train_loader[[1]]$idx
+train_loader[[1]]$batch
+
+for (batch in train_loader) {
+  print(batch$idx)
+  print(batch$batch)
+}
+
 
 
 #  NNet -------------------------------------------------------------------
@@ -214,6 +232,8 @@ getLayerSize <- function(X, y, hidden_neurons, train=TRUE) {
   
   return(size)
 }
+
+
 
 
 
