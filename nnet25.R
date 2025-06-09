@@ -136,6 +136,8 @@ ELU <- function(x, alpha = 1) {
 
 random_split <- function(data, split=c(0.8, 0.2)) {
   
+# prüft ob Split-Vektor zulässig ist und setzt 0.8,0.2 als default
+  
   # 1) Typ / Länge prüfen
   if (!is.numeric(split) || length(split) != 2) {
     stop("`split` muss ein numerischer Vektor der Länge 2 sein, z.B. c(0.8, 0.2).")
@@ -149,6 +151,7 @@ random_split <- function(data, split=c(0.8, 0.2)) {
     stop("Die Summe von `split` darf maximal 1.0 sein (du hast ", sum(split), ").")
   }
   
+  #Bestimmt Größe von Trainings- und Testdatensatz 
   n      <- nrow(data)
   n_train <- floor(split[1] * n)
   n_test  <- floor(split[2] * n) # oder besser 1-n_train
@@ -180,6 +183,10 @@ test <- datensplit$test
 
 DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
   
+#shuffelt Daten,erzeugt Start-Indizes für alle Batches (bei batch_size=32 : 1,33,65...)
+#entnimmt für jeden Index i die Zeilen i bis i+batchsize-1 aus den Daten 
+#transponiert die Batches und returnt sie inkl Numerierung der enthaltenen data points
+
   data <- as.matrix(data)
   
   if (shuffle) {
