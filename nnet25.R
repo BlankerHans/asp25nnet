@@ -6,11 +6,13 @@ library(numDeriv)
 # Loss --------------------------------------------------------------------
 
 
-neg_log_lik <- function(y, mu, sigma, reduction = c("sum","mean","raw")) {
+neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw")) {
   
   reduction <- match.arg(reduction)
   
-  loss_i <- log(sigma) + (y - mu)^2 / (2 * sigma^2)
+  sigma <- exp(log_sigma)
+  
+  loss_i <- log_sigma + (y - mu)^2 / (2 * sigma^2)
   
   if (reduction == "sum") {
     return(sum(loss_i))
@@ -232,19 +234,45 @@ for (batch in train_loader) {
 # create 80/20 train/test split of data set
 # convert X and y to matrices and transpose
 
-getLayerSize <- function(X, y, hidden_neurons, train=TRUE) {
-  n_x <- dim(X)[1]
+getLayerDimensions <- function(X, y, hidden_neurons, train=TRUE) {
+  n_x <- dim(X)[1] # generalistisch und würde zb der Batchsize entsprechen im Trainingsloop
+  # X ist pxm mit P=feature anzahl und m=beobachtungen/batchsize (für abdom auch ein zeilenvektor)
   n_h <- hidden_neurons
-  n_y <- dim(y)[1]   
+  n_y <- dim(y)[1] # anzahl an targets (für abdom ist es ein zeilenvektor da wir transponieren)
   
-  size <- list("n_x" = n_x,
+  dimensions_list <- list("n_x" = n_x,
                "n_h" = n_h,
                "n_y" = n_y)
   
-  return(size)
+  return(dimensions_list)
 }
 
+init_params <- function(dimensions_list) {
+  set.seed(42)
+  list(
+    W1 = matrix(rnorm(size$n_h * size$n_x, sd = 0.1), nrow = size$n_h, ncol = size$n_x),
+    b1 = matrix(0, nrow = size$n_h, ncol = 1),
+    W2 = matrix(rnorm(size$n_y * size$n_h, sd = 0.1), nrow = size$n_y, ncol = size$n_h),
+    b2 = matrix(0, nrow = size$n_y, ncol = 1)
+  )
+}
 
+forward_onehidden <- function(X, params) {
+  ones <- matrix(1, nrow = 1, ncol = dim(X)[2]) # oder in init params direkt für b1&b2 eine kxb matrix generieren mit selben biasen?
+  Z1 <- params$W1 %*% X + params$b1 %*% ones
+  A1 <- ReLU(Z1)
+  Z2 <- params$W2 %*% A1 + params$b2 %*% ones
+  mu_hat  <- Z2[1, , drop = FALSE]
+  log_sigma_hat <- Z2[2, , drop = FALSE]
+  
 
+  cache <- list("Z1" = Z1,
+                "A1" = A1,
+                "Z2" = Z2,
+                "mu" = mu_hat,
+                "z_log_sigma" = log_sigma_hat)
+  
+  return(cache)
+}
 
 
