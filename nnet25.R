@@ -247,8 +247,8 @@ getLayerDimensions <- function(X, y, hidden_neurons, train=TRUE) {
   return(dimensions_list)
 }
 
-init_params <- function(dimensions_list) {
-  set.seed(42)
+init_params <- function(dimensions_list, seed=42) {
+  # set.seed(seed)
   list(
     W1 = matrix(rnorm(size$n_h * size$n_x, sd = 0.1), nrow = size$n_h, ncol = size$n_x),
     b1 = matrix(0, nrow = size$n_h, ncol = 1),
