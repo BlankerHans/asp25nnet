@@ -241,3 +241,63 @@ getLayerSize <- function(X, y, hidden_neurons, train=TRUE) {
 
 
 
+# NN functions -----------------------------------------------------------
+
+init_params <- function(size) {
+  set.seed(42)
+  list(
+    W1 = matrix(rnorm(size$n_h * size$n_x, sd = 0.1), nrow = size$n_h, ncol = size$n_x),
+    b1 = matrix(0, nrow = size$n_h, ncol = 1),
+    W2 = matrix(rnorm(size$n_y * size$n_h, sd = 0.1), nrow = size$n_y, ncol = size$n_h),
+    b2 = matrix(0, nrow = size$n_y, ncol = 1)
+  )
+}
+
+forward_onehidden <- function(X, params) {
+  ones <- matrix(1, nrow = 1, ncol = dim(X)[2])
+  Z1 <- params$W1 %*% X + params$b1 %*% ones
+  A1 <- ReLU(Z1)
+  Z2 <- params$W2 %*% A1 + params$b2 %*% ones
+  z_mu  <- Z2[1, , drop = FALSE]
+  z_eta <- Z2[2, , drop = FALSE]
+  mu_hat <- z_mu
+  eta_hat <- Softplus(z_eta)
+  sigma_hat <- exp(eta_hat)
+  cache <- list(X = X, Z1 = Z1, A1 = A1, Z2 = Z2,
+                mu = mu_hat, eta = eta_hat, sigma = sigma_hat)
+  list(mu_hat = mu_hat, sigma_hat = sigma_hat, cache = cache)
+}
+
+loss_nll <- function(y, mu, sigma) {
+  sum(log(sigma) + (y - mu)^2 / (2 * sigma^2))
+}
+
+backward_onehidden <- function(y, params, cache) {
+  m <- ncol(y)
+  mu_hat <- cache$mu
+  sigma_hat <- cache$sigma
+  z_eta <- cache$Z2[2, , drop = FALSE]
+
+  delta_mu  <- -(y - mu_hat) / sigma_hat^2
+  delta_eta <- (1 - (y - mu_hat)^2 / sigma_hat^2) * sigmoid(z_eta)
+
+  delta2 <- rbind(delta_mu, delta_eta)
+  dW2 <- delta2 %*% t(cache$A1)
+  db2 <- delta2 %*% matrix(1, nrow = m, ncol = 1)
+
+  delta1_raw <- t(params$W2) %*% delta2
+  delta1 <- delta1_raw * (cache$Z1 > 0)
+
+  dW1 <- delta1 %*% t(cache$X)
+  db1 <- delta1 %*% matrix(1, nrow = m, ncol = 1)
+
+  list(dW1 = dW1, db1 = db1, dW2 = dW2, db2 = db2)
+}
+
+update_params <- function(params, grads, lr = 0.01) {
+  params$W1 <- params$W1 - lr * grads$dW1
+  params$b1 <- params$b1 - lr * grads$db1
+  params$W2 <- params$W2 - lr * grads$dW2
+  params$b2 <- params$b2 - lr * grads$db2
+  params
+}
