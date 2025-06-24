@@ -153,10 +153,13 @@ random_split <- function(data, split=c(0.8, 0.2)) {
     stop("Die Summe von `split` darf maximal 1.0 sein (du hast ", sum(split), ").")
   }
   
-  #Bestimmt Größe von Trainings- und Testdatensatz 
+  # Bestimmt Größe von Trainings- und Testdatensatz 
   n      <- nrow(data)
   n_train <- floor(split[1] * n)
   n_test  <- floor(split[2] * n) # oder besser 1-n_train
+  
+  # normalization
+  data <- scale(data)
   
   # ohne shuffle
   train <- data[1:n_train, , drop = FALSE]
