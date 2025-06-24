@@ -118,7 +118,11 @@ sigmoid <- function(x) {
 }
 
 ReLU <- function(x) {
-  return(pmax(0, x))
+  out <- pmax(0, x)
+  cn <- colnames(x)
+  dim(out) <- dim(x)  # Beibehaltung der Dimensionen
+  colnames(out) <- cn
+  return(out)
 }
 
 Softplus <- function(x) {
@@ -136,7 +140,7 @@ ELU <- function(x, alpha = 1) {
 
 # Data --------------------------------------------------------------------
 
-random_split <- function(data, split=c(0.8, 0.2)) {
+random_split <- function(data, split=c(0.8, 0.2), normalization=TRUE) {
   
 # prüft ob Split-Vektor zulässig ist und setzt 0.8,0.2 als default
   
@@ -159,7 +163,14 @@ random_split <- function(data, split=c(0.8, 0.2)) {
   n_test  <- floor(split[2] * n) # oder besser 1-n_train
   
   # normalization
-  data <- scale(data)
+  if (!is.logical(normalization) || length(normalization) != 1) {
+    stop("`normalization` must be TRUE or FALSE")
+  }
+  if (normalization) {
+    rn <- rownames(data)
+    data <- scale(data)
+    rownames(data) <- rn
+  }
   
   # ohne shuffle
   train <- data[1:n_train, , drop = FALSE]
@@ -180,10 +191,14 @@ random_split <- function(data, split=c(0.8, 0.2)) {
 }
 
 
-datensplit <- random_split(abdom)
+datensplit <- random_split(abdom["x"])
 
+targets <- abdom[["y"]]
 train <- datensplit$train
 test <- datensplit$test
+
+
+train
 
 
 DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
@@ -228,6 +243,15 @@ for (batch in train_loader) {
   print(batch$batch)
 }
 
+batch_counter <- 1
+
+for (batch in train_loader){
+  for (i in 1:length(batch$idx)) {
+    print(paste("Batch:", batch_counter, "Index:", batch$idx[i], "x-Value", batch$batch[i]))
+  }
+  batch_counter <- batch_counter + 1
+}
+
 
 
 #  NNet -------------------------------------------------------------------
@@ -237,11 +261,11 @@ for (batch in train_loader) {
 # create 80/20 train/test split of data set
 # convert X and y to matrices and transpose
 
-getLayerDimensions <- function(X, y, hidden_neurons, train=TRUE) {
+getLayerDimensions <- function(X, out_dim, hidden_neurons, train=TRUE) {
   n_x <- dim(X)[1] # generalistisch und würde zb der Batchsize entsprechen im Trainingsloop
   # X ist pxm mit P=feature anzahl und m=beobachtungen/batchsize (für abdom auch ein zeilenvektor)
   n_h <- hidden_neurons
-  n_y <- dim(y)[1] # anzahl an targets (für abdom ist es ein zeilenvektor da wir transponieren)
+  n_y <- out_dim
   
   dimensions_list <- list("n_x" = n_x,
                "n_h" = n_h,
@@ -250,15 +274,29 @@ getLayerDimensions <- function(X, y, hidden_neurons, train=TRUE) {
   return(dimensions_list)
 }
 
+# get targets with batch$idx
+# targets[train_loader[[1]]$idx]
+
+dimensions <- getLayerDimensions(train_loader[[1]]$batch, 2, hidden_neurons = 3)
+dimensions$n_h
+
+
+
+
 init_params <- function(dimensions_list, seed=42) {
-  # set.seed(seed)
+  set.seed(seed)
   list(
-    W1 = matrix(rnorm(size$n_h * size$n_x, sd = 0.1), nrow = size$n_h, ncol = size$n_x),
-    b1 = matrix(0, nrow = size$n_h, ncol = 1),
-    W2 = matrix(rnorm(size$n_y * size$n_h, sd = 0.1), nrow = size$n_y, ncol = size$n_h),
-    b2 = matrix(0, nrow = size$n_y, ncol = 1)
+    W1 = matrix(rnorm(dimensions_list$n_h * dimensions_list$n_x, sd = 0.1), nrow = dimensions_list$n_h, ncol = dimensions_list$n_x),
+    b1 = matrix(0, nrow = dimensions_list$n_h, ncol = 1),
+    W2 = matrix(rnorm(dimensions_list$n_y * dimensions_list$n_h, sd = 0.1), nrow = dimensions_list$n_y, ncol = dimensions_list$n_h),
+    b2 = matrix(0, nrow = dimensions_list$n_y, ncol = 1)
   )
 }
+
+test_params <- init_params(dimensions)
+
+
+
 
 forward_onehidden <- function(X, params) {
   ones <- matrix(1, nrow = 1, ncol = dim(X)[2]) # oder in init params direkt für b1&b2 eine kxb matrix generieren mit selben biasen?
@@ -273,9 +311,9 @@ forward_onehidden <- function(X, params) {
                 "A1" = A1,
                 "Z2" = Z2,
                 "mu" = mu_hat,
-                "z_log_sigma" = log_sigma_hat)
+                "log_sigma" = log_sigma_hat)
   
   return(cache)
 }
 
-
+forward_test <- forward_onehidden(train_loader[[1]]$batch, test_params)
