@@ -327,3 +327,99 @@ forward_onehidden <- function(X, params) {
 }
 
 forward_test <- forward_onehidden(train_loader[[1]]$batch, test_params)
+
+
+
+
+
+# Backpropagation für ein 1-Hidden-Layer-Netz
+backprop_onehidden <- function(X, y, cache, params) {
+  #
+  # X       : p × m Input-Matrix (Features × Batchsize)
+  # y       : Vektor der Länge m mit Zielwerten
+  # cache   : Liste mit Forward-Ergebnissen Z1, A1, Z2, mu, log_sigma
+  # params  : Liste mit Parametern W1, b1, W2, b2
+  #
+  m <- ncol(X)
+  
+  # 1) Berechne die Ableitungen der Loss nach den Output-Preactivations Z2
+  mu        <- as.numeric(cache$mu)         # Länge m
+  log_sigma <- as.numeric(cache$log_sigma)  # Länge m
+  sigma2    <- exp(2 * log_sigma)           # σ^2
+  
+  # δ_mu = dL/dz_mu = (mu - y) / σ^2
+  delta_mu  <- (mu - y) / sigma2            # Länge m
+  
+  # δ_eta = dL/dz_eta = 1 - (y - mu)^2 / σ^2
+  delta_eta <- 1 - (y - mu)^2 / sigma2      # Länge m
+  
+  # δ2 als 2×m Matrix
+  delta2 <- rbind(delta_mu,
+                  delta_eta)
+  
+  # 2) Gradienten für W2 und b2
+  dW2 <- (delta2 %*% t(cache$A1)) / m       # 2×k
+  db2 <- rowSums(delta2) / m                # Länge 2
+  
+  # 3) Rückprop in Hidden Layer
+  #    dA1 = W2^T %*% δ2
+  dA1    <- t(params$W2) %*% delta2         # k×m
+  
+  #    dZ1 = dA1 * ReLU'(Z1), ReLU'(z)=1[z>0]
+  dZ1    <- dA1 * (cache$Z1 > 0)            # k×m
+  
+  # 4) Gradienten für W1 und b1
+  dW1 <- (dZ1 %*% t(X)) / m                 # k×p
+  db1 <- rowSums(dZ1) / m                   # Länge k
+  
+  # 5) Gib alle Gradienten zurück
+  list(
+    dW1 = dW1,
+    db1 = matrix(db1, ncol = 1),
+    dW2 = dW2,
+    db2 = matrix(db2, ncol = 1)
+  )
+}
+
+
+
+
+train_network <- function(train_loader, targets, dimensions,
+                          epochs = 100, lr = 0.01) {
+  params  <- init_params(dimensions)
+  history <- numeric(epochs)
+  
+  for (e in seq_len(epochs)) {
+    batch_losses <- numeric(length(train_loader))
+    
+    for (i in seq_along(train_loader)) {
+      Xb <- train_loader[[i]]$batch
+      yb <- targets[ train_loader[[i]]$idx ]
+      
+      fwd <- forward_onehidden(Xb, params)
+      # Mean‐Loss pro Batch
+      batch_losses[i] <- neg_log_lik(yb,
+                                     as.numeric(fwd$mu),
+                                     as.numeric(fwd$log_sigma),
+                                     reduction = "mean")
+      
+      grads <- backprop_onehidden(Xb, yb, fwd, params)
+      params$W1 <- params$W1 - lr * grads$dW1
+      params$b1 <- params$b1 - lr * grads$db1
+      params$W2 <- params$W2 - lr * grads$dW2
+      params$b2 <- params$b2 - lr * grads$db2
+    }
+    
+    # Durchschnitt der Batch‐Means = Epoch‐Mean
+    history[e] <- mean(batch_losses)
+    message(sprintf("Epoch %3d/%d – Loss: %.6f",
+                    e, epochs, history[e]))
+  }
+  
+  list(params = params, history = history)
+}
+res <- train_network(train_loader,
+                     targets,
+                     dimensions,
+                     epochs = 10000,
+                     lr = 0.001)
