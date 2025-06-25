@@ -290,6 +290,13 @@ init_params <- function(dimensions_list, seed=42) {
     b1 = matrix(0, nrow = dimensions_list$n_h, ncol = 1),
     W2 = matrix(rnorm(dimensions_list$n_y * dimensions_list$n_h, sd = 0.1), nrow = dimensions_list$n_y, ncol = dimensions_list$n_h),
     b2 = matrix(0, nrow = dimensions_list$n_y, ncol = 1)
+  
+    #Dimensionen: 
+    # W1: n_h x n_x
+    # b1: n_h x 1
+    # W2: n_y x n_h
+    # b2: n_y x 1
+    
   )
 }
 
@@ -302,11 +309,14 @@ forward_onehidden <- function(X, params) {
   ones <- matrix(1, nrow = 1, ncol = dim(X)[2]) # oder in init params direkt für b1&b2 eine kxb matrix generieren mit selben biasen?
   Z1 <- params$W1 %*% X + params$b1 %*% ones
   A1 <- ReLU(Z1)
-  Z2 <- params$W2 %*% A1 + params$b2 %*% ones
+  Z2 <- params$W2 %*% A1 + params$b2 %*% ones #erste Zeile: my, zweite Zeile: log_sigma
   mu_hat  <- Z2[1, , drop = FALSE]
   log_sigma_hat <- Z2[2, , drop = FALSE]
+        
+  #Dimensionen:
+  #Z1: n_h x m 
+  #Z2: n_y x m
   
-
   cache <- list("Z1" = Z1,
                 "A1" = A1,
                 "Z2" = Z2,
