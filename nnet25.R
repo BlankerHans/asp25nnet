@@ -418,6 +418,8 @@ train_network <- function(train_loader, targets, dimensions,
   
   list(params = params, history = history)
 }
+
+
 res <- train_network(train_loader,
                      targets,
                      dimensions,
