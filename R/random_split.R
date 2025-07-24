@@ -41,7 +41,7 @@ random_split <- function(data, split=c(0.8, 0.2), normalization=TRUE) {
   }
 
   # Bestimmt Größe von Trainings- und Testdatensatz
-  n      <- nrow(data)
+  n <- nrow(data)
   n_train <- floor(split[1] * n)
   n_test  <- floor(split[2] * n) # oder besser 1-n_train
 

@@ -1,1 +1,2 @@
+library(usethis)
 library(devtools)

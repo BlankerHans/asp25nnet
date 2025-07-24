@@ -75,7 +75,7 @@ train_network_val <- function(train_loader, targets, dimensions,
     }
 
     # Mean training loss
-    history[e] <- mean(batch_losses)
+    history_train[e] <- mean(batch_losses)
 
     #Validation loss
     fwd_val <- forward_onehidden(validation_X, params)
