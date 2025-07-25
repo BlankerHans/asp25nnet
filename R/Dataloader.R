@@ -4,7 +4,7 @@
 #' Optionally shuffles the data before batching.
 #' Each batch is transposed and returned along with the indices of included data points.
 #'
-#' @param data A data frame or matrix to be processed in batches.
+#' @param data A matrix to be processed in batches. (Use the output of the train_val_tes func)
 #' @param batch_size Integer specifying the size of each batch (default is 32).
 #' @param shuffle Logical, whether to shuffle the data before batching (default is TRUE).
 #'
@@ -19,8 +19,9 @@
 #' Each batch is transposed (columns represent individual data points) and returned along with their indices.
 #'
 #' @examples
-#' data <- matrix(1:1000, ncol = 10)
-#' batches <- DataLoader(data, batch_size = 50, shuffle = FALSE)
+#' df <- data.frame(x = rnorm(100), y = rnorm(100))
+#' res <- train_val_test(df, split = c(0.6, 0.2, 0.2))
+#' train_loader <- DataLoader(res$train, batch_size = 50, shuffle = FALSE)
 #' str(batches[[1]])
 #'
 #' @export

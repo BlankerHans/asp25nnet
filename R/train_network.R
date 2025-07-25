@@ -46,7 +46,7 @@ train_network <- function(train_loader, targets, dimensions,
       batch_losses[i] <- neg_log_lik(yb,
                                      as.numeric(fwd$mu),
                                      as.numeric(fwd$log_sigma),
-                                     reduction = "mean")
+                                     reduction = "mean") # mean oder raw?
 
       grads <- backprop_onehidden(Xb, yb, fwd, params)
       params$W1 <- params$W1 - lr * grads$dW1

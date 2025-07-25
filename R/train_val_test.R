@@ -3,7 +3,7 @@
 #' Randomly shuffles the rows of a data frame and splits them into
 #' training, validation, and test subsets according to specified proportions.
 #'
-#' @param data A data frame or matrix to split.
+#' @param data A data frame to split. (exclude the target variable)
 #' @param split Numeric vector of length 3 specifying proportions for train,
 #'   validation, and test sets. Must sum to exactly 1.
 #' @param normalization Logical, whether to z-score normalize the data.

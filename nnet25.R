@@ -7,13 +7,13 @@ library(numDeriv)
 
 
 neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw")) {
-  
+
   reduction <- match.arg(reduction)
-  
+
   sigma <- exp(log_sigma)
-  
+
   loss_i <- log_sigma + (y - mu)^2 / (2 * sigma^2)
-  
+
   if (reduction == "sum") {
     return(sum(loss_i))
   } else if (reduction == "mean") {
@@ -141,9 +141,9 @@ ELU <- function(x, alpha = 1) {
 # Data --------------------------------------------------------------------
 
 random_split <- function(data, split=c(0.8, 0.2), normalization=TRUE) {
-  
+
 # prüft ob Split-Vektor zulässig ist und setzt 0.8,0.2 als default
-  
+
   # 1) Typ / Länge prüfen
   if (!is.numeric(split) || length(split) != 2) {
     stop("`split` muss ein numerischer Vektor der Länge 2 sein, z.B. c(0.8, 0.2).")
@@ -156,12 +156,12 @@ random_split <- function(data, split=c(0.8, 0.2), normalization=TRUE) {
   if (sum(split) > 1) {
     stop("Die Summe von `split` darf maximal 1.0 sein (du hast ", sum(split), ").")
   }
-  
-  # Bestimmt Größe von Trainings- und Testdatensatz 
+
+  # Bestimmt Größe von Trainings- und Testdatensatz
   n      <- nrow(data)
   n_train <- floor(split[1] * n)
   n_test  <- floor(split[2] * n) # oder besser 1-n_train
-  
+
   # normalization
   if (!is.logical(normalization) || length(normalization) != 1) {
     stop("`normalization` must be TRUE or FALSE")
@@ -171,15 +171,15 @@ random_split <- function(data, split=c(0.8, 0.2), normalization=TRUE) {
     data <- scale(data)
     rownames(data) <- rn
   }
-  
+
   # ohne shuffle
   train <- data[1:n_train, , drop = FALSE]
   test <- data[(n_train + 1):n, , drop = FALSE]
-  
+
   # "shuffled" schon die daten
   # train <- sample(n, n_train)
   # test  <- sample(setdiff(seq_len(n), train), n_test)
-  
+
   # return(list(
   #   train = data[train, , drop = FALSE],
   #   test  = data[test,  , drop = FALSE]
@@ -202,21 +202,21 @@ train
 
 
 DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
-  
+
 #shuffelt Daten,erzeugt Start-Indizes für alle Batches (bei batch_size=32 : 1,33,65...)
-#entnimmt für jeden Index i die Zeilen i bis i+batchsize-1 aus den Daten 
+#entnimmt für jeden Index i die Zeilen i bis i+batchsize-1 aus den Daten
 #transponiert die Batches und returnt sie inkl Numerierung der enthaltenen data points
 
   data <- as.matrix(data)
-  
+
   if (shuffle) {
     data <- data[sample(nrow(data)), , drop = FALSE]
   }
-  
+
   n <- nrow(data)
   # Start-Indizes der Batches: 1, 1+batch_size, 1+2*batch_size, …
   starts <- seq(1, n, by = batch_size)
-  
+
   # Für jeden Start einen kleinen Data Frame erzeugen
   batches <- lapply(starts, function(i) {
     mat <- data[i:min(i+batch_size-1, n), , drop = FALSE]
@@ -227,7 +227,7 @@ DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
       idx = idx
     )
   })
-    
+
   return(batches)
 }
 
@@ -262,15 +262,15 @@ for (batch in train_loader){
 # convert X and y to matrices and transpose
 
 getLayerDimensions <- function(X, out_dim, hidden_neurons, train=TRUE) {
-  n_x <- dim(X)[1] # generalistisch und würde zb der Batchsize entsprechen im Trainingsloop
+  n_x <- dim(X)[1]
   # X ist pxm mit P=feature anzahl und m=beobachtungen/batchsize (für abdom auch ein zeilenvektor)
   n_h <- hidden_neurons
   n_y <- out_dim
-  
+
   dimensions_list <- list("n_x" = n_x,
                "n_h" = n_h,
                "n_y" = n_y)
-  
+
   return(dimensions_list)
 }
 
@@ -290,13 +290,13 @@ init_params <- function(dimensions_list, seed=42) {
     b1 = matrix(0, nrow = dimensions_list$n_h, ncol = 1),
     W2 = matrix(rnorm(dimensions_list$n_y * dimensions_list$n_h, sd = 0.1), nrow = dimensions_list$n_y, ncol = dimensions_list$n_h),
     b2 = matrix(0, nrow = dimensions_list$n_y, ncol = 1)
-  
-    #Dimensionen: 
+
+    #Dimensionen:
     # W1: n_h x n_x
     # b1: n_h x 1
     # W2: n_y x n_h
     # b2: n_y x 1
-    
+
   )
 }
 
@@ -312,17 +312,17 @@ forward_onehidden <- function(X, params) {
   Z2 <- params$W2 %*% A1 + params$b2 %*% ones #erste Zeile: my, zweite Zeile: log_sigma
   mu_hat  <- Z2[1, , drop = FALSE]
   log_sigma_hat <- Z2[2, , drop = FALSE]
-        
+
   #Dimensionen:
-  #Z1: n_h x m 
+  #Z1: n_h x m
   #Z2: n_y x m
-  
+
   cache <- list("Z1" = Z1,
                 "A1" = A1,
                 "Z2" = Z2,
                 "mu" = mu_hat,
                 "log_sigma" = log_sigma_hat)
-  
+
   return(cache)
 }
 
@@ -341,37 +341,37 @@ backprop_onehidden <- function(X, y, cache, params) {
   # params  : Liste mit Parametern W1, b1, W2, b2
   #
   m <- ncol(X)
-  
+
   # 1) Berechne die Ableitungen der Loss nach den Output-Preactivations Z2
   mu        <- as.numeric(cache$mu)         # Länge m
   log_sigma <- as.numeric(cache$log_sigma)  # Länge m
   sigma2    <- exp(2 * log_sigma)           # σ^2
-  
+
   # δ_mu = dL/dz_mu = (mu - y) / σ^2
   delta_mu  <- (mu - y) / sigma2            # Länge m
-  
+
   # δ_eta = dL/dz_eta = 1 - (y - mu)^2 / σ^2
   delta_eta <- 1 - (y - mu)^2 / sigma2      # Länge m
-  
+
   # δ2 als 2×m Matrix
   delta2 <- rbind(delta_mu,
                   delta_eta)
-  
+
   # 2) Gradienten für W2 und b2
   dW2 <- (delta2 %*% t(cache$A1)) / m       # 2×k
   db2 <- rowSums(delta2) / m                # Länge 2
-  
+
   # 3) Rückprop in Hidden Layer
   #    dA1 = W2^T %*% δ2
   dA1    <- t(params$W2) %*% delta2         # k×m
-  
+
   #    dZ1 = dA1 * ReLU'(Z1), ReLU'(z)=1[z>0]
   dZ1    <- dA1 * (cache$Z1 > 0)            # k×m
-  
+
   # 4) Gradienten für W1 und b1
   dW1 <- (dZ1 %*% t(X)) / m                 # k×p
   db1 <- rowSums(dZ1) / m                   # Länge k
-  
+
   # 5) Gib alle Gradienten zurück
   list(
     dW1 = dW1,
@@ -388,34 +388,34 @@ train_network <- function(train_loader, targets, dimensions,
                           epochs = 100, lr = 0.01) {
   params  <- init_params(dimensions)
   history <- numeric(epochs)
-  
+
   for (e in seq_len(epochs)) {
     batch_losses <- numeric(length(train_loader))
-    
+
     for (i in seq_along(train_loader)) {
       Xb <- train_loader[[i]]$batch
       yb <- targets[ train_loader[[i]]$idx ]
-      
+
       fwd <- forward_onehidden(Xb, params)
       # Mean‐Loss pro Batch
       batch_losses[i] <- neg_log_lik(yb,
                                      as.numeric(fwd$mu),
                                      as.numeric(fwd$log_sigma),
                                      reduction = "mean")
-      
+
       grads <- backprop_onehidden(Xb, yb, fwd, params)
       params$W1 <- params$W1 - lr * grads$dW1
       params$b1 <- params$b1 - lr * grads$db1
       params$W2 <- params$W2 - lr * grads$dW2
       params$b2 <- params$b2 - lr * grads$db2
     }
-    
+
     # Durchschnitt der Batch‐Means = Epoch‐Mean
     history[e] <- mean(batch_losses)
     message(sprintf("Epoch %3d/%d – Loss: %.6f",
                     e, epochs, history[e]))
   }
-  
+
   list(params = params, history = history)
 }
 

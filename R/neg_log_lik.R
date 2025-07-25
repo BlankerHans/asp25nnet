@@ -35,7 +35,7 @@ neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw")) {
 
   sigma <- exp(log_sigma)
 
-  loss_i <- log_sigma + (y - mu)^2 / (2 * sigma^2)
+  loss_i <- 0.5 * log(2*pi) + log_sigma + (y - mu)^2 / (2 * sigma^2)
 
   if (reduction == "sum") {
     return(sum(loss_i))

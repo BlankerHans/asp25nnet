@@ -38,11 +38,39 @@ test <- split$test
 nrow(dataframe) == nrow(test)+nrow(train)+nrow(val)
 
 train_loader <- DataLoader(split$train)
-val_loader <- DataLoader(split$val, shuffle=FALSE)
+
+# val_loader <- DataLoader(split$val, shuffle=FALSE) bräuchte man nur wenn wir das
+# training umschreiben so dass wir auch pro batch einen validation forward machen
+
+
+
 
 targets <- dataframe$abh
-val_targets <- targets[val_loader$idx]
+val_targets <- targets[as.integer(rownames(val))]
 
 dimensions <- getLayerDimensions(train_loader[[1]]$batch, 2, hidden_neurons = 3)
 
-train_network_val_adam()
+
+
+
+train_network_val_adam(train_loader, targets, dimensions, t(val), val_targets)
+
+
+train_network(train_loader,
+              targets,
+              dimensions)
+
+
+
+params <- init_params(dimensions)
+W1 <- params$W1
+params$W2
+
+dim(W1)
+dim(train_loader[[1]]$batch)
+class(W1)
+class(train_loader[[1]]$batch)
+dim(W1%*% train_loader[[1]]$batch)
+
+
+train(train_loader, targets, dimensions, t(val), val_targets)

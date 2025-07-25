@@ -69,7 +69,7 @@ train_network_val_adam <- function(
     }
 
     # 2b) Loss‐Logging
-    history_train[e] <- mean(batch_losses)
+    history_train[e] <- mean(batch_losses) # gerade haben wir mean of means
     fwd_val <- forward_onehidden(validation_X, params)
     history_val[e] <- neg_log_lik(
       validation_y,
