@@ -1,4 +1,4 @@
-update_adam <- function(m, v, grad) {
+update_adam <- function(m, v, grad, beta1, beta2, t_global, lr, eps) {
   m_new <- beta1 * m + (1 - beta1) * grad
   v_new <- beta2 * v + (1 - beta2) * (grad^2)
   m_hat <- m_new / (1 - beta1^t_global)

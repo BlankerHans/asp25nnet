@@ -75,22 +75,22 @@ train <- function(
 
 
         # W1
-        tmp  <- update_adam(opt$mW1, opt$vW1, grads$dW1)
+        tmp  <- update_adam(opt$mW1, opt$vW1, grads$dW1, beta1, beta2, t_global, lr, eps)
         opt$mW1 <- tmp$m; opt$vW1 <- tmp$v
         params$W1 <- params$W1 - tmp$delta
 
         # b1
-        tmp  <- update_adam(opt$mb1, opt$vb1, grads$db1)
+        tmp  <- update_adam(opt$mb1, opt$vb1, grads$db1, beta1, beta2, t_global, lr, eps)
         opt$mb1 <- tmp$m; opt$vb1 <- tmp$v
         params$b1 <- params$b1 - tmp$delta
 
         # W2
-        tmp  <- update_adam(opt$mW2, opt$vW2, grads$dW2)
+        tmp  <- update_adam(opt$mW2, opt$vW2, grads$dW2, beta1, beta2, t_global, lr, eps)
         opt$mW2 <- tmp$m; opt$vW2 <- tmp$v
         params$W2 <- params$W2 - tmp$delta
 
         # b2
-        tmp  <- update_adam(opt$mb2, opt$vb2, grads$db2)
+        tmp  <- update_adam(opt$mb2, opt$vb2, grads$db2, beta1, beta2, t_global, lr, eps)
         opt$mb2 <- tmp$m; opt$vb2 <- tmp$v
         params$b2 <- params$b2 - tmp$delta
       }

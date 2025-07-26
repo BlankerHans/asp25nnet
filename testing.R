@@ -1,5 +1,3 @@
-data <- abdom
-
 load_all()
 
 set.seed(42)
@@ -73,12 +71,47 @@ class(train_loader[[1]]$batch)
 dim(W1%*% train_loader[[1]]$batch)
 
 
-model <- train(train_loader, targets, dimensions, t(val), val_targets)
+model <- train(train_loader, targets, dimensions, t(val), val_targets, optimizer = "adam")
 model
 
-
+# oder ggplot nutzen?
 
 plot(1:length(model$train_loss), model$train_loss, type = "l", col = "blue")
 plot(1:length(model$val_loss), model$val_loss, type = "l", col = "red")
 
 summary(model)
+
+
+View(abdom)
+abdom_split <- train_val_test(abdom['x'], normalization=FALSE)
+abdom_targets <- abdom$y
+
+train_abdom <- abdom_split$train
+val_abdom <- abdom_split$validation
+val_abdom_targets <- abdom_targets[as.integer(rownames(val_abdom))]
+
+
+abdom_loader <- DataLoader(train_abdom)
+dimensions <- getLayerDimensions(abdom_loader[[1]]$batch, 2, hidden_neurons = 50)
+
+model2 <- train(abdom_loader, abdom_targets, dimensions, t(val_abdom), val_abdom_targets, optimizer="adam", epochs=1000)
+model2
+summary(model2)
+
+
+fwd_abdom <- forward_onehidden(t(abdom['x']), model2$params)
+mu <- fwd_abdom$mu
+plot(abdom$x, abdom$y, xlab = "x", ylab = "y", main = "Abdomen Data")
+lines(abdom$x, mu, col = "red", lwd = 2)
+sigma <- exp(fwd_abdom$log_sigma)
+upper <- mu + 1.96 * sigma
+lower <- mu - 1.96 * sigma
+
+polygon(
+  c(abdom$x, rev(abdom$x)),
+  c(upper, rev(lower)),
+  col = rgb(0.2, 0.2, 1, alpha = 0.2),
+  border = NA
+)
+
+

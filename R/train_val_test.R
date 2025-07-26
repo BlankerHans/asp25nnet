@@ -41,7 +41,7 @@ train_val_test <- function(data, split = c(0.6, 0.2, 0.2), normalization = TRUE)
   }
   if (normalization) {
     rn <- rownames(data)
-    data <- scale(data)
+    data <- scale(data) # scale mit ganzen datensatz oder nur mit mean/var vom train split?
     rownames(data) <- rn
   }
 
