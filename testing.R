@@ -99,6 +99,7 @@ model2
 summary(model2)
 
 
+# folgendes in summary übertragen
 fwd_abdom <- forward_onehidden(t(abdom['x']), model2$params)
 mu <- fwd_abdom$mu
 plot(abdom$x, abdom$y, xlab = "x", ylab = "y", main = "Abdomen Data")
@@ -114,4 +115,64 @@ polygon(
   border = NA
 )
 
+
+# Non-linear data & heteroskedasticity
+
+set.seed(42)
+n     <- 500
+x     <- runif(n, 0, 10)
+mu    <- 5 * sin(x)
+sigma <- 0.5 + 0.3 * x
+eps   <- rnorm(n, 0, sigma)
+y     <- mu + eps
+df    <- data.frame(x = x, y = y, mu = mu, sigma = sigma)
+
+ord   <- order(df$x)
+plot(df$x, df$y, pch = 16, cex = 0.6, xlab = "x", ylab = "y", main = "Nicht‐linear + Heteroskedastisch")
+
+
+View(df)
+sim_split <- train_val_test(df['x'], normalization=FALSE)
+sim_targets <- df$y
+
+train_sim <- sim_split$train
+val_sim <- sim_split$validation
+val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
+
+
+sim_loader <- DataLoader(train_sim)
+dimensions <- getLayerDimensions(sim_loader[[1]]$batch, 2, hidden_neurons = 50)
+
+model3 <- train(sim_loader, sim_targets, dimensions, t(val_sim), val_sim_targets, optimizer="adam", epochs=1000)
+model3
+summary(model3)
+
+fwd_sim <- forward_onehidden(t(df['x']), model3$params)
+mu_sim <- fwd_sim$mu
+sigma_sim <- exp(fwd_sim$log_sigma)
+
+# Sortierindex berechnen
+ord <- order(df$x)
+
+plot(df$x, df$y,
+     pch   = 16,
+     cex   = 0.6,
+     xlab  = "x",
+     ylab  = "y",
+     main  = "Nicht‐linear + Heteroskedastisch")
+
+
+lines(df$x[ord], mu_sim[ord],
+      col = "red",
+      lwd = 2)
+
+
+upper <- mu_sim + 1.96 * sigma_sim
+lower <- mu_sim - 1.96 * sigma_sim
+polygon(
+  x    = c(df$x[ord], rev(df$x[ord])),
+  y    = c(upper[ord], rev(lower[ord])),
+  col   = rgb(1, 0, 0, alpha = 0.2),
+  border = NA
+)
 
