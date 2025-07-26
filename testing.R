@@ -73,4 +73,12 @@ class(train_loader[[1]]$batch)
 dim(W1%*% train_loader[[1]]$batch)
 
 
-train(train_loader, targets, dimensions, t(val), val_targets)
+model <- train(train_loader, targets, dimensions, t(val), val_targets)
+model
+
+
+
+plot(1:length(model$train_loss), model$train_loss, type = "l", col = "blue")
+plot(1:length(model$val_loss), model$val_loss, type = "l", col = "red")
+
+summary(model)
