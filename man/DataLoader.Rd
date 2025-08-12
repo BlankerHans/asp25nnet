@@ -7,7 +7,7 @@
 DataLoader(data, batch_size = 32, shuffle = TRUE)
 }
 \arguments{
-\item{data}{A data frame or matrix to be processed in batches.}
+\item{data}{A matrix to be processed in batches. (Use the output of the train_val_tes func)}
 
 \item{batch_size}{Integer specifying the size of each batch (default is 32).}
 
@@ -30,8 +30,9 @@ The function generates start indices for the batches (e.g., 1, 33, 65, ... with 
 Each batch is transposed (columns represent individual data points) and returned along with their indices.
 }
 \examples{
-data <- matrix(1:1000, ncol = 10)
-batches <- DataLoader(data, batch_size = 50, shuffle = FALSE)
+df <- data.frame(x = rnorm(100), y = rnorm(100))
+res <- train_val_test(df, split = c(0.6, 0.2, 0.2))
+train_loader <- DataLoader(res$train, batch_size = 50, shuffle = FALSE)
 str(batches[[1]])
 
 }

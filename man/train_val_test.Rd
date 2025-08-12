@@ -7,7 +7,7 @@
 train_val_test(data, split = c(0.6, 0.2, 0.2), normalization = TRUE)
 }
 \arguments{
-\item{data}{A data frame or matrix to split.}
+\item{data}{A data frame to split. (exclude the target variable)}
 
 \item{split}{Numeric vector of length 3 specifying proportions for train,
 validation, and test sets. Must sum to exactly 1.}
