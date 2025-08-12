@@ -2,29 +2,38 @@
 % Please edit documentation in R/train_val_test.R
 \name{train_val_test}
 \alias{train_val_test}
-\title{Split a data frame into training, validation, and test sets}
+\title{Split dataset into training, validation and test sets with optional normalization}
 \usage{
 train_val_test(data, split = c(0.6, 0.2, 0.2), normalization = TRUE)
 }
 \arguments{
-\item{data}{A data frame to split. (exclude the target variable)}
+\item{data}{A data frame or matrix containing the dataset to split.}
 
-\item{split}{Numeric vector of length 3 specifying proportions for train,
-validation, and test sets. Must sum to exactly 1.}
+\item{split}{Numeric vector of length 3 specifying the proportions for the training,
+validation, and test sets. Must sum to 1. Default is c(0.6, 0.2, 0.2).}
 
-\item{normalization}{Logical, whether to z-score normalize the data.}
+\item{normalization}{Logical indicating whether to normalize the subsets based on
+mean and standard deviation of the training data. Default is TRUE.}
 }
 \value{
-A list with three elements: \code{train}, \code{validation},
-and \code{test}, each containing the corresponding subset of rows.
+A list with the following components:
+\describe{
+\item{train}{Training subset (normalized if \code{normalization = TRUE}).}
+\item{validation}{Validation subset (normalized if \code{normalization = TRUE}).}
+\item{test}{Test subset (normalized if \code{normalization = TRUE}).}
+\item{normalization_params}{List with \code{mean} and \code{sd} vectors of training data used for normalization. Only returned if \code{normalization = TRUE}.}
+}
 }
 \description{
-Randomly shuffles the rows of a data frame and splits them into
-training, validation, and test subsets according to specified proportions.
+This function splits a given dataset into training, validation, and test subsets
+according to the specified proportions. It optionally normalizes all subsets based
+on the mean and standard deviation of the training set.
 }
 \examples{
-set.seed(42)
-df <- data.frame(x = rnorm(100), y = rnorm(100))
-res <- train_val_test(df, split = c(0.6, 0.2, 0.2))
-str(res)
+\dontrun{
+  data(iris)
+  result <- train_val_test(iris[, 1:4], split = c(0.7, 0.15, 0.15), normalization = TRUE)
+  str(result)
+}
+
 }
