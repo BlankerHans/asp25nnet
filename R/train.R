@@ -99,7 +99,7 @@ train <- function(
     }
 
     # Loss‐Logging
-    history_train[e] <- mean(batch_losses) # wir berechnen mean of means
+    history_train[e] <- weighted.mean(batch_losses, batch_sizes)  # wir berechnen mean of means
     if (!is.null(val_split)) {
       fwd_val <- forward_onehidden(val_split, params)
       history_val[e] <- neg_log_lik(
