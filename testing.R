@@ -175,20 +175,3 @@ polygon(
   col   = rgb(1, 0, 0, alpha = 0.2),
   border = NA
 )
-
-
-
-
-
-batch <- sim_loader[[1]]$batch
-y_targ <- y[sim_loader[[1]]$idx]
-dim(batch)
-
-batch_forward <- forward_onehidden(batch, model3$params)
-batch_forward
-
-neg_log_lik(y_targ, as.numeric(batch_forward$mu), as.numeric(batch_forward$log_sigma),reduction = "sum")
-
-
-test_hist <- list(2)
-test_hist[1] <- neg_log_lik(y_targ, as.numeric(batch_forward$mu), as.numeric(batch_forward$log_sigma), reduction = "sum")
