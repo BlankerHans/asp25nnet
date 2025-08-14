@@ -27,7 +27,7 @@ dataframe <- as.data.frame(cbind(x, y))
 View(dataframe)
 colnames(dataframe) <- c("unab", "abh")
 
-split <- train_val_test(dataframe["unab"])
+split <- random_split(dataframe["unab"])
 train <- split$train
 val <- split$val
 test <- split$test
@@ -83,7 +83,7 @@ summary(model)
 
 
 View(abdom)
-abdom_split <- train_val_test(abdom['x'], normalization=FALSE)
+abdom_split <- random_split(abdom['x'], normalization=FALSE)
 abdom_targets <- abdom$y
 
 train_abdom <- abdom_split$train
@@ -132,7 +132,7 @@ plot(df$x, df$y, pch = 16, cex = 0.6, xlab = "x", ylab = "y", main = "Nicht‐li
 
 
 View(df)
-sim_split <- train_val_test(df['x'], normalization=FALSE)
+sim_split <- random_split(df['x'], normalization=FALSE)
 sim_targets <- df$y
 
 train_sim <- sim_split$train
@@ -176,3 +176,19 @@ polygon(
   border = NA
 )
 
+
+
+
+
+batch <- sim_loader[[1]]$batch
+y_targ <- y[sim_loader[[1]]$idx]
+dim(batch)
+
+batch_forward <- forward_onehidden(batch, model3$params)
+batch_forward
+
+neg_log_lik(y_targ, as.numeric(batch_forward$mu), as.numeric(batch_forward$log_sigma),reduction = "sum")
+
+
+test_hist <- list(2)
+test_hist[1] <- neg_log_lik(y_targ, as.numeric(batch_forward$mu), as.numeric(batch_forward$log_sigma), reduction = "sum")
