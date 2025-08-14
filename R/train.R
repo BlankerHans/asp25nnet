@@ -46,10 +46,12 @@ train <- function(
   # Trainingsloop
   for (e in seq_len(epochs)) {
     batch_losses <- numeric(length(train_loader))
+    batch_sizes <- numeric(length(train_loader))
 
     for (i in seq_along(train_loader)) {
       Xb  <- train_loader[[i]]$batch
       yb  <- targets[train_loader[[i]]$idx]
+      batch_sizes[i] <- length(yb)
       fwd <- forward_onehidden(Xb, params)
 
       # Loss
