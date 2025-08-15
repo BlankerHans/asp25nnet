@@ -76,8 +76,8 @@ model
 
 # oder ggplot nutzen?
 
-plot(1:length(model$train_loss), model$train_loss, type = "l", col = "blue")
-plot(1:length(model$val_loss), model$val_loss, type = "l", col = "red")
+#plot(1:length(model$train_loss), model$train_loss, type = "l", col = "blue")
+#plot(1:length(model$val_loss), model$val_loss, type = "l", col = "red")
 
 summary(model)
 
@@ -92,7 +92,7 @@ val_abdom_targets <- abdom_targets[as.integer(rownames(val_abdom))]
 
 
 abdom_loader <- DataLoader(train_abdom)
-dimensions <- getLayerDimensions(abdom_loader[[1]]$batch, 2, hidden_neurons = 50)
+dimensions <- getLayerDimensions(abdom_loader[[1]]$batch, 2, hidden_neurons = 3)
 
 model2 <- train(abdom_loader, abdom_targets, dimensions, t(val_abdom), val_abdom_targets, optimizer="adam", epochs=1000)
 model2
@@ -119,7 +119,7 @@ polygon(
 # Non-linear data & heteroskedasticity
 
 set.seed(42)
-n     <- 500
+n     <- 10000
 x     <- runif(n, 0, 10)
 mu    <- 5 * sin(x)
 sigma <- 0.5 + 0.3 * x
@@ -140,10 +140,10 @@ val_sim <- sim_split$validation
 val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
 
 
-sim_loader <- DataLoader(train_sim)
+sim_loader <- DataLoader(train_sim, batch_size = 256)
 dimensions <- getLayerDimensions(sim_loader[[1]]$batch, 2, hidden_neurons = 50)
 
-model3 <- train(sim_loader, sim_targets, dimensions, t(val_sim), val_sim_targets, optimizer="adam", epochs=1000)
+model3 <- train(sim_loader, sim_targets, dimensions, t(val_sim), val_sim_targets, optimizer="adam", epochs=1000, lr=0.0001)
 model3
 summary(model3)
 

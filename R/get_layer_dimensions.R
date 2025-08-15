@@ -6,7 +6,6 @@
 #' @param X A numeric matrix or vector representing input data. If a matrix, rows correspond to features and columns to observations.
 #' @param out_dim Integer specifying the output dimension (e.g., number of output units).
 #' @param hidden_neurons Integer specifying the number of neurons in the hidden layer.
-#' @param train Logical value indicating whether the data is used for training (currently not affecting the output). Default is \code{TRUE}.
 #'
 #' @return A named list with elements:
 #' \item{n_x}{Number of input features (rows of \code{X}).}
@@ -19,7 +18,7 @@
 #' dims$n_x
 #'
 #' @export
-getLayerDimensions <- function(X, out_dim, hidden_neurons, train=TRUE) {
+getLayerDimensions <- function(X, out_dim, hidden_neurons) {
   n_x <- dim(X)[1]
   n_h <- hidden_neurons
   n_y <- out_dim
