@@ -4,7 +4,7 @@
 \alias{getLayerDimensions}
 \title{Get Layer Dimensions for a Neural Network}
 \usage{
-getLayerDimensions(X, out_dim, hidden_neurons, train = TRUE)
+getLayerDimensions(X, out_dim, hidden_neurons)
 }
 \arguments{
 \item{X}{A numeric matrix or vector representing input data. If a matrix, rows correspond to features and columns to observations.}
@@ -12,8 +12,6 @@ getLayerDimensions(X, out_dim, hidden_neurons, train = TRUE)
 \item{out_dim}{Integer specifying the output dimension (e.g., number of output units).}
 
 \item{hidden_neurons}{Integer specifying the number of neurons in the hidden layer.}
-
-\item{train}{Logical value indicating whether the data is used for training (currently not affecting the output). Default is \code{TRUE}.}
 }
 \value{
 A named list with elements:
