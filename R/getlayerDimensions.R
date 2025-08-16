@@ -3,7 +3,9 @@
 #' Determines the input, hidden, and output layer dimensions based on the input matrix
 #' and specified configuration.
 #'
-#' @param X A numeric matrix or vector representing input data. If a matrix, rows correspond to features and columns to observations.
+#' @param X A numeric matrix or vector representing input data.
+#' If a matrix, rows correspond to features and columns to observations (i.e, you may need to transpose your original data).
+#' Best use the outputted batch of our DataLoader function as input X.
 #' @param out_dim Integer specifying the output dimension (e.g., number of output units).
 #' @param hidden_neurons Integer specifying the number of neurons in the hidden layer.
 #'

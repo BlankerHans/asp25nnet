@@ -143,7 +143,7 @@ val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
 sim_loader <- DataLoader(train_sim, batch_size = 256)
 dimensions <- getLayerDimensions(sim_loader[[1]]$batch, 2, hidden_neurons = 50)
 
-model3 <- train(sim_loader, sim_targets, dimensions, t(val_sim), val_sim_targets, optimizer="adam", epochs=1000, lr=0.0001)
+model3 <- train(sim_loader, sim_targets, dimensions, t(val_sim), val_sim_targets, optimizer="adam", epochs=1000, lr=0.01)
 model3
 summary(model3)
 
@@ -175,3 +175,12 @@ polygon(
   col   = rgb(1, 0, 0, alpha = 0.2),
   border = NA
 )
+
+
+
+# Test for variable layer sizes and multiple inputs
+multi_layer_dims <- getLayerDimensions_variable(sim_loader[[1]]$batch, out_dim = 2, hidden_neurons = c(50, 30, 20))
+dim(sim_loader[[1]]$batch)[1]
+
+params <- init_params_variable(multi_layer_dims)
+lapply(params, dim)

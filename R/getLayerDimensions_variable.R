@@ -1,6 +1,6 @@
 #' Get layer dimensions for variable-size network
 #'
-#' @param X Input data matrix
+#' @param X Input data matrix. Best use the first batch of the output of our DataLoader function.
 #' @param out_dim Output dimension
 #' @param hidden_neurons Vector of neurons per hidden layer, e.g., c(50, 30, 20) chronologically ordered flowing from input to output, i.e. left to right
 #' @return List with network dimensions
