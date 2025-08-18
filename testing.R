@@ -184,3 +184,6 @@ dim(sim_loader[[1]]$batch)[1]
 
 params <- init_params_variable(multi_layer_dims)
 lapply(params, dim)
+
+
+forward_variable(sim_loader[[1]]$batch, params)
