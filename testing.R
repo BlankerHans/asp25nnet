@@ -119,7 +119,7 @@ polygon(
 # Non-linear data & heteroskedasticity
 
 set.seed(42)
-n     <- 10000
+n     <- 1000
 x     <- runif(n, 0, 10)
 mu    <- 5 * sin(x)
 sigma <- 0.5 + 0.3 * x

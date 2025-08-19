@@ -7,7 +7,7 @@
 #' @return List of gradients
 #' @export
 backprop_variable <- function(X, y, cache, params) {
-  m <- ncol(X)
+  B <- ncol(X)
   n_layers <- cache$n_layers
   grads <- list()
 
@@ -27,8 +27,8 @@ backprop_variable <- function(X, y, cache, params) {
   dW_out_name <- paste0("dW", n_layers + 1)
   db_out_name <- paste0("db", n_layers + 1)
 
-  grads[[dW_out_name]] <- (delta %*% t(A_last)) / m
-  grads[[db_out_name]] <- matrix(rowSums(delta) / m, ncol = 1)
+  grads[[dW_out_name]] <- (delta %*% t(A_last)) / B
+  grads[[db_out_name]] <- matrix(rowSums(delta) / B, ncol = 1)
 
   # Backpropagate through hidden layers
   dA_next <- t(params[[W_out_name]]) %*% delta
@@ -43,12 +43,12 @@ backprop_variable <- function(X, y, cache, params) {
 
     if (l > 1) {
       A_prev <- cache[[paste0("A", l-1)]]
-      grads[[dW_name]] <- (dZ %*% t(A_prev)) / m
+      grads[[dW_name]] <- (dZ %*% t(A_prev)) / B
     } else {
-      grads[[dW_name]] <- (dZ %*% t(X)) / m
+      grads[[dW_name]] <- (dZ %*% t(X)) / B
     }
 
-    grads[[db_name]] <- matrix(rowSums(dZ) / m, ncol = 1)
+    grads[[db_name]] <- matrix(rowSums(dZ) / B, ncol = 1)
 
     if (l > 1) {
       dA_next <- t(params[[W_name]]) %*% dZ
