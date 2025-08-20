@@ -122,7 +122,10 @@ train <- function(
 
   out <- list(
     params = params,
-    train_loss = history_train
+    train_loss = history_train,
+    epochs = epochs,
+    lr = lr,
+    optimizer = optimizer
   )
   if (!is.null(history_val)) out$val_loss <- history_val
   invisible(out)
