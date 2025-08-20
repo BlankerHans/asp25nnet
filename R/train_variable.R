@@ -128,7 +128,10 @@ train_variable <- function(
   out <- list(
     params = params,
     train_loss = history_train,
-    architecture = arch
+    architecture = arch,
+    epochs = epochs,
+    lr = lr,
+    optimizer = optimizer
   )
   if (!is.null(history_val)) out$val_loss <- history_val
 
