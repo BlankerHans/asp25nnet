@@ -143,9 +143,9 @@ val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
 sim_loader <- DataLoader(train_sim, batch_size = 256)
 dimensions <- getLayerDimensions(sim_loader[[1]]$batch, 2, hidden_neurons = 50)
 
-model3 <- train(sim_loader, sim_targets, dimensions, t(val_sim), val_sim_targets, optimizer="adam", epochs=1000, lr=0.01)
+model3 <- train_variable(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(50),optimizer="adam", epochs=10, lr=0.01)
 model3
-summary(model3)
+summary(model3, plot=TRUE)
 
 fwd_sim <- forward_onehidden(t(df['x']), model3$params)
 mu_sim <- fwd_sim$mu

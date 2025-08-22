@@ -262,7 +262,7 @@ for (batch in train_loader){
 # convert X and y to matrices and transpose
 
 getLayerDimensions <- function(X, out_dim, hidden_neurons, train=TRUE) {
-  n_x <- dim(X)[1]
+  n_x <- dim(X)[1] # generalistisch und würde zb der Batchsize entsprechen im Trainingsloop
   # X ist pxm mit P=feature anzahl und m=beobachtungen/batchsize (für abdom auch ein zeilenvektor)
   n_h <- hidden_neurons
   n_y <- out_dim
@@ -425,3 +425,4 @@ res <- train_network(train_loader,
                      dimensions,
                      epochs = 10000,
                      lr = 0.001)
+

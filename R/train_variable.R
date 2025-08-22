@@ -1,11 +1,14 @@
 train_variable <- function(
-    train_loader, targets, dimensions,
-    val_split = NULL, val_targets = NULL,
+    train_loader, targets,
+    val_split = NULL, val_targets = NULL, hidden_neurons,
     epochs = 100, lr = 0.01,
     optimizer = c("sgd", "adam"),
     beta1 = 0.9, beta2 = 0.999, eps = 1e-8
 ) {
   optimizer <- match.arg(optimizer)
+
+  dimensions <- getLayerDimensions_variable(train_loader[[1]]$batch, hidden_neurons=hidden_neurons)
+
   params <- init_params_variable(dimensions)
   arch <- attr(params, "architecture")
   n_layers <- arch$n_layers
@@ -107,7 +110,7 @@ train_variable <- function(
       # Display architecture in first epoch
       if (e == 1) {
         arch_str <- paste(c(arch$n_x, arch$n_h, arch$n_y), collapse = " -> ")
-        message(sprintf("Training network with architecture: %s", arch_str))
+        message(sprintf("Trained network with architecture: %s", arch_str))
       }
 
       message(sprintf(

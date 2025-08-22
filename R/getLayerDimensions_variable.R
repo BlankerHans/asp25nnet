@@ -5,7 +5,7 @@
 #' @param hidden_neurons Vector of neurons per hidden layer, e.g., c(50, 30, 20) chronologically ordered flowing from input to output, i.e. left to right
 #' @return List with network dimensions
 #' @export
-getLayerDimensions_variable <- function(X, out_dim, hidden_neurons) {
+getLayerDimensions_variable <- function(X, out_dim=2, hidden_neurons) {
   n_x <- dim(X)[1]
 
   # Ensure hidden_neurons is a vector
