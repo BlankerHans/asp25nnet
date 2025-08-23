@@ -48,7 +48,7 @@ train_variable <- function(
       # Compute loss
       batch_losses[i] <- neg_log_lik(
         yb, as.numeric(fwd$mu), as.numeric(fwd$log_sigma),
-        reduction = "mean"
+        reduction = "sum"
       )
 
       # Backward pass
@@ -106,13 +106,6 @@ train_variable <- function(
         as.numeric(fwd_val$log_sigma),
         reduction = "mean"
       )
-
-      # Display architecture in first epoch
-      if (e == 1) {
-        arch_str <- paste(c(arch$n_x, arch$n_h, arch$n_y), collapse = " -> ")
-        message(sprintf("Trained network with architecture: %s", arch_str))
-      }
-
       message(sprintf(
         "Epoch %3d/%d – Train: %.6f | Val: %.6f",
         e, epochs, history_train[e], history_val[e]
@@ -124,6 +117,10 @@ train_variable <- function(
       ))
     }
   }
+
+  # Display architecture in first epoch
+  arch_str <- paste(c(arch$n_x, arch$n_h, arch$n_y), collapse = " -> ")
+  message(sprintf("Trained network with architecture: %s", arch_str))
 
   # Preserve architecture in params
   attr(params, "architecture") <- arch
