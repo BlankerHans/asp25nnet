@@ -91,11 +91,11 @@ val_abdom <- abdom_split$validation
 val_abdom_targets <- abdom_targets[as.integer(rownames(val_abdom))]
 
 
-abdom_loader <- DataLoader(train_abdom)
+abdom_loader <- DataLoader(train_abdom, batch_size = 256)
 
-model2 <- train_variable(abdom_loader, abdom_targets, t(val_abdom), val_abdom_targets, c(50), optimizer="adam", epochs=1000, lr=0.001)
+model2 <- train_variable(abdom_loader, abdom_targets, t(val_abdom), val_abdom_targets, c(50), optimizer="adam", epochs=2000, lr=0.01)
 model2
-summary.NN(model2, yscale="auto")
+summary.NN(model2, yscale="robust", drop_first=10)
 
 
 # folgendes in summary übertragen
