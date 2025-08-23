@@ -2,7 +2,7 @@
 #' @param object Ein NN-Objekt
 #' @param ... weitere Argumente
 #' @export
-#' @method summary N
+#' @method summary NN
 summary.NN <- function(object,
                        show_plot = TRUE,
                        yscale = c("auto","log","robust"),
@@ -19,6 +19,10 @@ summary.NN <- function(object,
   cat("\tLearning rate:          ", object$lr, "\n")
   cat("\tNumber of epochs:       ", object$epochs, "\n\n")
 
+  ## Architektur-Details
+  plot_architecture(object)
+
+  cat("\n")
   cat("Training Results \n")
   cat("------------------------------\n")
   cat("\tTrained Epochs:         ", length(object$train_loss), "\n")
