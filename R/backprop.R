@@ -6,7 +6,7 @@
 #' @param params Network parameters
 #' @return List of gradients
 #' @export
-backprop_variable <- function(X, y, cache, params) {
+backprop <- function(X, y, cache, params) {
   B <- ncol(X)
   n_layers <- cache$n_layers
   grads <- list()

@@ -1,3 +1,8 @@
+#' Summary für NN-Objekte
+#' @param object Ein NN-Objekt
+#' @param ... weitere Argumente
+#' @export
+#' @method summary N
 summary.NN <- function(object,
                        show_plot = TRUE,
                        yscale = c("auto","log","robust"),

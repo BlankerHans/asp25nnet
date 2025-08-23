@@ -20,7 +20,7 @@
 #' dims$n_x
 #'
 #' @export
-getLayerDimensions <- function(X, out_dim, hidden_neurons) {
+getLayerDimensions <- function(X, out_dim=2, hidden_neurons) {
   n_x <- dim(X)[1]
   n_h <- hidden_neurons
   n_y <- out_dim

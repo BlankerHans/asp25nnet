@@ -1,14 +1,14 @@
 #' Forward propagation for network with variable layer sizes
 #'
 #' @param X Input matrix (features × batch_size)
-#' @param params Network parameters from init_params_variable
+#' @param params Network parameters from init_params
 #' @return List with all intermediate values and outputs
 #' @export
-forward_variable <- function(X, params) {
+forward <- function(X, params) {
   # Extract architecture info
   arch <- attr(params, "architecture")
   if (is.null(arch)) {
-    stop("Parameters must have architecture attribute. Use init_params_variable().")
+    stop("Parameters must have architecture attribute. Use init_params().")
   }
 
   n_layers <- arch$n_layers

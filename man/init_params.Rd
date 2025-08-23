@@ -2,36 +2,18 @@
 % Please edit documentation in R/init_params.R
 \name{init_params}
 \alias{init_params}
-\title{Initialize Neural Network Parameters}
+\title{Initialize parameters for multi-layer network with variable layer sizes}
 \usage{
 init_params(dimensions_list, seed = 42)
 }
 \arguments{
-\item{dimensions_list}{A list specifying the network dimensions. Must contain:
-\code{n_x}: Number of input features,
-\code{n_h}: Number of hidden neurons,
-\code{n_y}: Number of output units.}
+\item{dimensions_list}{List with n_x (input), n_h (vector of hidden neurons per layer), n_y (output)}
 
-\item{seed}{Integer random seed for reproducibility. Default is 42.}
+\item{seed}{Random seed for reproducibility}
 }
 \value{
-A list containing:
-\itemize{
-\item \code{W1}: Weight matrix of shape (n_h × n_x).
-\item \code{b1}: Bias vector of shape (n_h × 1).
-\item \code{W2}: Weight matrix of shape (n_y × n_h).
-\item \code{b2}: Bias vector of shape (n_y × 1).
-}
+List of weight matrices and bias vectors for all layers
 }
 \description{
-Creates randomly initialized weight matrices and zero bias vectors for a single-hidden-layer neural network.
-}
-\details{
-Weights are initialized with random values drawn from a normal distribution
-with mean 0 and standard deviation 0.1. Bias vectors are initialized to zeros.
-}
-\examples{
-dims <- list(n_x = 5, n_h = 10, n_y = 2)
-params <- init_params(dims)
-
+Initialize parameters for multi-layer network with variable layer sizes
 }

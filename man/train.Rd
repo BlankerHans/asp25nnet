@@ -2,14 +2,14 @@
 % Please edit documentation in R/train.R
 \name{train}
 \alias{train}
-\title{Train a Single-Hidden-Layer Neural Network (SGD oder Adam, optional mit Validation)}
+\title{Train a Multi-Layer Neural Network (SGD oder Adam, optional mit Validation)}
 \usage{
 train(
   train_loader,
   targets,
-  dimensions,
   val_split = NULL,
   val_targets = NULL,
+  hidden_neurons,
   epochs = 100,
   lr = 0.01,
   optimizer = c("sgd", "adam"),
@@ -23,11 +23,11 @@ train(
 
 \item{targets}{Zielwerte für alle Beobachtungen.}
 
-\item{dimensions}{Netzwerk-Dimensionen (aus getLayerDimensions()).}
-
 \item{val_split}{Optional: Matrix für Validierungs-Inputs.}
 
 \item{val_targets}{Optional: Vektor für Validierungs-Ziele.}
+
+\item{hidden_neurons}{Vector of neurons per hidden layer, e.g., c(50, 30, 20) chronologically ordered flowing from input to output, i.e. left to right}
 
 \item{epochs}{Anzahl Epochen (Default 100).}
 
@@ -48,5 +48,5 @@ Liste mit
 \item{val_loss}{Optional: Vektor der Validierungsverluste pro Epoche}
 }
 \description{
-Train a Single-Hidden-Layer Neural Network (SGD oder Adam, optional mit Validation)
+Train a Multi-Layer Neural Network (SGD oder Adam, optional mit Validation)
 }
