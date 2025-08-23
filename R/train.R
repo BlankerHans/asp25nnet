@@ -57,8 +57,8 @@ train <- function(
       # Loss
       batch_losses[i] <- neg_log_lik(
         yb, as.numeric(fwd$mu), as.numeric(fwd$log_sigma),
-        reduction = "raw"
-      ) # mean oder raw?
+        reduction = "sum"
+      )
 
       # Gradienten
       grads <- backprop_onehidden(Xb, yb, fwd, params)

@@ -1,3 +1,22 @@
+#' Train a Multi-Layer Neural Network (SGD oder Adam, optional mit Validation)
+#'
+#' @param train_loader  Liste von Batches (jeweils $batch und $idx).
+#' @param targets       Zielwerte für alle Beobachtungen.
+#' @param hidden_neurons Vector of neurons per hidden layer, e.g., c(50, 30, 20) chronologically ordered flowing from input to output, i.e. left to right
+#' @param epochs        Anzahl Epochen (Default 100).
+#' @param lr            Lernrate (Default 0.01).
+#' @param optimizer     Optimizer, entweder "sgd" oder "adam" (Default "sgd").
+#' @param beta1         Adam β1 (nur wenn optimizer = "adam", Default 0.9).
+#' @param beta2         Adam β2 (nur wenn optimizer = "adam", Default 0.999).
+#' @param eps           Adam ε (nur wenn optimizer = "adam", Default 1e-8).
+#' @param val_split  Optional: Matrix für Validierungs-Inputs.
+#' @param val_targets  Optional: Vektor für Validierungs-Ziele.
+#'
+#' @return Liste mit
+#' \item{params}{Gelernte Parameter}
+#' \item{train_loss}{Vektor der Trainingsverluste pro Epoche}
+#' \item{val_loss}{Optional: Vektor der Validierungsverluste pro Epoche}
+#' @export
 train_variable <- function(
     train_loader, targets,
     val_split = NULL, val_targets = NULL, hidden_neurons,
@@ -48,7 +67,7 @@ train_variable <- function(
       # Compute loss
       batch_losses[i] <- neg_log_lik(
         yb, as.numeric(fwd$mu), as.numeric(fwd$log_sigma),
-        reduction = "sum"
+        reduction = "mean"
       )
 
       # Backward pass
@@ -118,7 +137,7 @@ train_variable <- function(
     }
   }
 
-  # Display architecture in first epoch
+  # Display architecture after last epoch
   arch_str <- paste(c(arch$n_x, arch$n_h, arch$n_y), collapse = " -> ")
   message(sprintf("Trained network with architecture: %s", arch_str))
 
@@ -135,5 +154,6 @@ train_variable <- function(
   )
   if (!is.null(history_val)) out$val_loss <- history_val
 
+  class(out) <- c("NN", class(out))
   return(out)
 }

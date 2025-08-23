@@ -143,9 +143,9 @@ val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
 sim_loader <- DataLoader(train_sim, batch_size = 256)
 dimensions <- getLayerDimensions(sim_loader[[1]]$batch, 2, hidden_neurons = 50)
 
-model3 <- train_variable(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(50),optimizer="adam", epochs=10, lr=0.01)
-model3
-summary(model3, plot=TRUE)
+model3 <- train_variable(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(100),optimizer="adam", epochs=2000, lr=0.01)
+class(model3)
+summary(model3, plots=TRUE)
 
 fwd_sim <- forward_onehidden(t(df['x']), model3$params)
 mu_sim <- fwd_sim$mu
@@ -179,7 +179,7 @@ polygon(
 
 
 # Test for variable layer sizes and multiple inputs
-multi_layer_dims <- getLayerDimensions_variable(sim_loader[[1]]$batch, out_dim = 2, hidden_neurons = c(50, 30, 20))
+multi_layer_dims <- getLayerDimensions_variable(sim_loader[[1]]$batch, out_dim = 2, hidden_neurons = c(10, 5, 10))
 dim(sim_loader[[1]]$batch)[1]
 
 params <- init_params_variable(multi_layer_dims)
