@@ -1,61 +1,81 @@
-summary <- function(model, plots = TRUE) {
+summary.NN <- function(object,
+                       show_plot = TRUE,
+                       yscale = c("auto","log","robust"),
+                       cap_quantile = 0.99,
+                       drop_first = 0) {
+  yscale <- match.arg(yscale)
 
-  cat("--Model Summary-- \n")
+  cat("--Model Summary--\n")
   cat("==============================\n\n")
-  # Summary layer architecture (activation, Nr of params per layer)
-  # Summary Training setup (optimizer, batch size, epochs, learning rate)
   cat("Training Setup \n")
   cat("------------------------------\n")
-  cat("\tOptimizer:              ", model$optimizer, "\n")
-  cat("\tLoss function:          ", "Negative Log-Likelihood\n") #<-generalisieren falls Wahlmöglichkeit implememtiert!!
-  cat("\tLearning rate:          ", model$lr, "\n")
-  #cat("batch size:            ", models$batch_size, "\n")
-  cat("\tNumber of epochs:       ", model$epochs, "\n\n")
+  cat("\tOptimizer:              ", object$optimizer, "\n")
+  cat("\tLoss function:          ", "Negative Log-Likelihood\n")
+  cat("\tLearning rate:          ", object$lr, "\n")
+  cat("\tNumber of epochs:       ", object$epochs, "\n\n")
 
-  # Summary Training (final train, val & test loss)
   cat("Training Results \n")
   cat("------------------------------\n")
-  cat("\tTrained Epochs:         ", length(model$train_loss) , "\n") #Für early stopping
-  cat(sprintf("\tFinal training loss:     %.3f\n", tail(model$train_loss, 1)))
-  if (!is.null(model$val_loss)) {
-  cat(sprintf("\tFinal validation loss:   %.3f\n", tail(model$val_loss, 1)))
+  cat("\tTrained Epochs:         ", length(object$train_loss), "\n")
+  cat(sprintf("\tFinal training loss:     %.3f\n", tail(object$train_loss, 1)))
+  if (!is.null(object$val_loss)) {
+    cat(sprintf("\tFinal validation loss:   %.3f\n", tail(object$val_loss, 1)))
+  }
 
-    }
-  #cat("Loss on test set:       ", , "\n")
+  tl <- as.numeric(object$train_loss)
+  vl <- if (!is.null(object$val_loss)) as.numeric(object$val_loss) else NULL
+  if (drop_first > 0 && length(tl) > drop_first) {
+    idx <- (drop_first + 1):length(tl); tl <- tl[idx]; if (!is.null(vl)) vl <- vl[idx]
+  }
 
-  # Summary Plots (anpassen dass 3D graph bei 2 Inputs und NAM Vorschlag bei >2 Inputs)
+  if (isTRUE(show_plot) && length(tl) > 0) {
+    epochs   <- seq_along(tl)
+    loss_all <- if (!is.null(vl)) c(tl, vl) else tl
 
-  if (plots) {
-    epochs <- seq_along(model$train_loss)
+    if (yscale == "log") {
+      min_pos <- min(loss_all[loss_all > 0], na.rm = TRUE)
+      tl2 <- pmax(tl, min_pos * 1e-6)
+      vl2 <- if (!is.null(vl)) pmax(vl, min_pos * 1e-6) else NULL
 
-    if (!is.null(model$val_loss)) {
-      rng <- range(c(model$train_loss, model$val_loss))
-    } else {
-      rng <- range(model$train_loss)
-    }
+      graphics::plot(epochs, tl2, type = "l", log = "y",
+                     main = "Training vs. Validation Loss",
+                     xlab = "Epoch", ylab = "Loss",
+                     col = "blue")                          # <-- Farbe
+      if (!is.null(vl2)) {
+        graphics::lines(epochs, vl2, lty = 2, col = "red")  # <-- Farbe
+        graphics::legend("topright", c("Train","Validation"),
+                         lty = c(1,2), col = c("blue","red"), bty = "n")
+      }
 
-    # Summary Plot Training
-    plot(
-      epochs, model$train_loss, type = "l",
-      col  = "blue",
-      ylim = rng,
-      main = "Training vs. Validation Loss",
-      xlab = "Epoch",
-      ylab = "Loss"
-    )
+    } else if (yscale == "robust") {
+      cap <- stats::quantile(loss_all, cap_quantile, na.rm = TRUE)
+      tl2 <- pmin(tl, cap)
+      vl2 <- if (!is.null(vl)) pmin(vl, cap) else NULL
+      rng <- range(c(tl2, vl2), finite = TRUE)
 
-    if (!is.null(model$val_loss)) {
-      lines(epochs, model$val_loss, col = "red", lty = 2)
-      legend(
-        "topright",
-        legend = c("Train", "Validation"),
-        col    = c("blue", "red"),
-        lty    = c(1, 2),
-        bty    = "n"
-      )
+      graphics::plot(epochs, tl2, type = "l", ylim = rng,
+                     main = "Training vs. Validation Loss",
+                     xlab = "Epoch", ylab = "Loss",
+                     col = "blue")                          # <-- Farbe
+      if (!is.null(vl2)) {
+        graphics::lines(epochs, vl2, lty = 2, col = "red")  # <-- Farbe
+        graphics::legend("topright", c("Train","Validation"),
+                         lty = c(1,2), col = c("blue","red"), bty = "n")
+      }
+
+    } else { # auto
+      rng <- range(loss_all, finite = TRUE)
+      graphics::plot(epochs, tl, type = "l", ylim = rng,
+                     main = "Training vs. Validation Loss",
+                     xlab = "Epoch", ylab = "Loss",
+                     col = "blue")                          # <-- Farbe
+      if (!is.null(vl)) {
+        graphics::lines(epochs, vl, lty = 2, col = "red")   # <-- Farbe
+        graphics::legend("topright", c("Train","Validation"),
+                         lty = c(1,2), col = c("blue","red"), bty = "n")
+      }
     }
   }
 
-  invisible(NULL)
+  invisible(object)
 }
-#

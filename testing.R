@@ -71,7 +71,7 @@ class(train_loader[[1]]$batch)
 dim(W1%*% train_loader[[1]]$batch)
 
 
-model <- train(train_loader, targets, dimensions, t(val), val_targets, optimizer = "adam")
+model <- train_variable(train_loader, targets, dimensions, t(val), val_targets, c(50), optimizer = "adam")
 model
 
 # oder ggplot nutzen?
@@ -92,11 +92,10 @@ val_abdom_targets <- abdom_targets[as.integer(rownames(val_abdom))]
 
 
 abdom_loader <- DataLoader(train_abdom)
-dimensions <- getLayerDimensions(abdom_loader[[1]]$batch, 2, hidden_neurons = 3)
 
-model2 <- train(abdom_loader, abdom_targets, dimensions, t(val_abdom), val_abdom_targets, optimizer="adam", epochs=1000)
+model2 <- train_variable(abdom_loader, abdom_targets, t(val_abdom), val_abdom_targets, c(50), optimizer="adam", epochs=1000, lr=0.001)
 model2
-summary(model2)
+summary.NN(model2, yscale="auto")
 
 
 # folgendes in summary übertragen
@@ -140,12 +139,12 @@ val_sim <- sim_split$validation
 val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
 
 
-sim_loader <- DataLoader(train_sim, batch_size = 256)
+sim_loader <- DataLoader(train_sim, batch_size = 1024)
 dimensions <- getLayerDimensions(sim_loader[[1]]$batch, 2, hidden_neurons = 50)
 
 model3 <- train_variable(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(100),optimizer="adam", epochs=2000, lr=0.01)
 class(model3)
-summary(model3, plots=TRUE)
+summary.NN(model3, show_plot=TRUE, yscale="robust", drop_first=10)
 
 fwd_sim <- forward_onehidden(t(df['x']), model3$params)
 mu_sim <- fwd_sim$mu
