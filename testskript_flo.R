@@ -1,20 +1,15 @@
 load_all()
-data <- abdom
+abdom_split <- random_split(abdom['x'], normalization=FALSE)
+abdom_targets <- abdom$y
 
-colnames(data) <- c("unab", "abh")
+train_abdom <- abdom_split$train
+val_abdom <- abdom_split$validation
+val_abdom_targets <- abdom_targets[as.integer(rownames(val_abdom))]
 
-split <- random_split(data["unab"])
-train <- split$train
-val <- split$val
-test <- split$test
 
-train_loader <- DataLoader(split$train)
+abdom_loader <- DataLoader(train_abdom, batch_size = 256)
 
-targets <- data$abh
-val_targets <- targets[as.integer(rownames(val))]
-
-dimensions <- getLayerDimensions(train_loader[[1]]$batch, 2, hidden_neurons = 3)
-model <- train(train_loader, targets, dimensions, t(val), val_targets,epochs = 50,lr = 0.001 ,optimizer = "sgd")
-summary.NN(model)
+model <- train(abdom_loader, abdom_targets, t(val_abdom), val_abdom_targets, c(50), optimizer="adam", epochs=500, lr=0.01)
+summary.NN(model, yscale="robust", drop_first=10)
 
 
