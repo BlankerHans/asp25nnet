@@ -22,7 +22,8 @@ train <- function(
     val_split = NULL, val_targets = NULL, hidden_neurons,
     epochs = 100, lr = 0.01,
     optimizer = c("sgd", "adam"),
-    beta1 = 0.9, beta2 = 0.999, eps = 1e-8
+    beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
+    normalization_params = NULL
 ) {
   optimizer <- match.arg(optimizer)
 
@@ -150,7 +151,8 @@ train <- function(
     architecture = arch,
     epochs = epochs,
     lr = lr,
-    optimizer = optimizer
+    optimizer = optimizer,
+    normalization = normalization_params
   )
   if (!is.null(history_val)) out$val_loss <- history_val
 

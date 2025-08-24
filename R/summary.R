@@ -4,6 +4,8 @@
 #' @export
 #' @method summary NN
 summary.NN <- function(object,
+                       data,
+                       target_col,
                        show_plot = TRUE,
                        yscale = c("auto","log","robust"),
                        cap_quantile = 0.99,
@@ -92,6 +94,56 @@ summary.NN <- function(object,
                          lty = c(1,2), col = c("blue","red"), bty = "n")
       }
     }
+
+
+    # == Data Preparation for prediction plot ==
+    x_col <- setdiff(names(data), target_col)
+    X <- data[, x_col, drop = FALSE]
+
+    # If needed, normalize features based on mean, sd of training set
+    if (!is.null(object$normalization)) {
+      X <- scale(X, center = object$normalization$mean, scale = object$normalization$sd)
+    }
+
+    X <- t(as.matrix(X)) # transpose matrix for forward pass
+    nr_inputs <- length(x_col)
+
+    # Forward pass with trained parameters
+    fwd <- forward(X, object$params)
+
+    #mu and sigma according to forward pass
+    mu <- as.numeric(fwd$mu)
+    sigma <- exp(as.numeric(fwd$log_sigma))
+
+    #boundaries for CI
+    upper <- mu + 1.96 * sigma
+    lower <- mu - 1.96 * sigma
+
+    # Prediction plot: 1 Input
+    if (nr_inputs == 1) {
+      #Sort by input
+      ord <- order(data[[x_col]])
+      x_sorted <- data[[x_col]][ord]
+      y_sorted <- data[[target_col]][ord]
+      mu_sorted <- mu[ord]
+      upper_sorted <- upper[ord]
+      lower_sorted <- lower[ord]
+
+      #Plot
+      plot(x_sorted, y_sorted,
+           xlab = x_col, ylab = target_col,
+           main = paste("Model fit on", target_col, "vs", x_col))
+
+      #line for mu
+      lines(x_sorted, mu_sorted, col = "red", lwd = 2)
+
+      #add CI
+      polygon(c(x_sorted, rev(x_sorted)),
+              c(upper_sorted, rev(lower_sorted)),
+              col = rgb(0.2, 0.2, 1, alpha = 0.2),
+              border = NA)
+    }
+
 
 
 
