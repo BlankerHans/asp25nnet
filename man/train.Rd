@@ -15,7 +15,8 @@ train(
   optimizer = c("sgd", "adam"),
   beta1 = 0.9,
   beta2 = 0.999,
-  eps = 1e-08
+  eps = 1e-08,
+  normalization_params = NULL
 )
 }
 \arguments{

@@ -4,7 +4,7 @@
 \alias{getLayerDimensions}
 \title{Get Layer Dimensions for a Neural Network}
 \usage{
-getLayerDimensions(X, out_dim, hidden_neurons)
+getLayerDimensions(X, out_dim = 2, hidden_neurons)
 }
 \arguments{
 \item{X}{A numeric matrix or vector representing input data.
