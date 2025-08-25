@@ -61,7 +61,7 @@ model <- train(df_loader, df_targets, t(val_df), val_df_targets, c(50), optimize
 summary.NN(model, df, "y", yscale="robust", drop_first=10)
 
 #~~~~~~~~~~~~~~Summary test with 2 Input dataset~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+load_all()
 set.seed(42)
 
 n <- 500  # Anzahl der Datenpunkte
@@ -79,7 +79,7 @@ y <- sin(x1) + 0.5 * x2^2 + rnorm(n, mean = 0, sd = sigma)
 # Datensatz zusammenfassen
 df_whole <- data.frame(x1 = x1, x2 = x2, y = y)
 df_x <- data.frame(x1 = x1, x2 = x2)
-df_split <- random_split(df_x, normalization=FALSE)
+df_split <- random_split(df_x, normalization=TRUE)
 df_targets <- df_whole$y
 
 
@@ -93,3 +93,30 @@ df_loader <- DataLoader(train_df, batch_size = 256)
 model <- train(df_loader, df_targets, t(val_df), val_df_targets, c(50), optimizer="adam", epochs=500, lr=0.01)
 load_all()
 summary.NN(model, df_whole, "y", yscale="robust", drop_first=10)
+rglwidget()
+#-------------------------------------------------------------
+
+x1 <- data[[x_col[1]]]
+x2 <- data[[x_col[2]]]
+y <- data[[target_col]]
+
+open3d()
+plot3d(x1, x2, y,
+       col = "blue",
+       type ="s",
+       radius = .5,
+       size = 5)
+
+# Achsen + Titel
+axes3d()
+title3d(xlab = x_col[1],
+        ylab = x_col[2],
+        zlab = target_col,
+        #main = "3D Fit"
+)
+
+
+
+
+# Datensatz zusammenfassen
+df_whole <- data.frame(x1 = x1, x2 = x2, y = y)

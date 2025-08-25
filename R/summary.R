@@ -15,15 +15,16 @@ summary.NN <- function(object,
 
   cat("--Model Summary--\n")
   cat("==============================\n\n")
-  cat("Training Setup \n")
+
+  ## NN architecture
+  plot_architecture(object)
+
+  cat("\n\nTraining Setup \n")
   cat("------------------------------\n")
   cat("\tOptimizer:              ", object$optimizer, "\n")
   cat("\tLoss function:          ", "Negative Log-Likelihood\n")
   cat("\tLearning rate:          ", object$lr, "\n")
   cat("\tNumber of epochs:       ", object$epochs, "\n\n")
-
-  ## Architektur-Details
-  plot_architecture(object)
 
   cat("\n")
   cat("Training Results \n")
@@ -147,24 +148,55 @@ summary.NN <- function(object,
 
     #Prediction plot: 2 Inputs
     else if (nr_inputs == 2) {
-    x1 <- data[[x_col[1]]]
-    x2 <- data[[x_col[2]]]
-    y <- data[[target_col]]
+      library(rgl)
 
-    #Scatterplot
-    scatterplot3d::scatterplot3d(
-      x1, x2, y,
-      xlab = x_col[1], ylab = x_col[2], zlab = target_col,
-      main = "3D plot with model predictions"
-    )
-    # ToDos: Plot schöner machen, evtl andere plottingfunktion, prediction hinzufügen
+      x1 <- data[[x_col[1]]]
+      x2 <- data[[x_col[2]]]
+      y  <- data[[target_col]]
+
+      # Grid für Vorhersagen
+      grid_size <- 40
+      x1_seq <- seq(min(x1), max(x1), length.out = grid_size)
+      x2_seq <- seq(min(x2), max(x2), length.out = grid_size)
+
+      grid <- expand.grid(x1_seq, x2_seq)
+      names(grid) <- x_col
+
+      # Normalisieren falls nötig
+      if (!is.null(object$normalization)) {
+        grid <- scale(grid,
+                      center = object$normalization$mean[x_col],
+                      scale  = object$normalization$sd[x_col])
+      }
+
+      X_grid <- t(as.matrix(grid))
+
+      # Forward pass
+      fwd_grid   <- forward(X_grid, object$params)
+      mu_grid    <- matrix(as.numeric(fwd_grid$mu), nrow = grid_size, byrow = FALSE)
+
+      # Plot
+      open3d()
+      points3d(x1, x2, y, col = "black", size = 5)  # Datenpunkte
+
+      # Fläche: mu
+      surface3d(x1_seq, x2_seq, mu_grid, color = "red", alpha = 0.6, front = "lines")
+
+      # Achsen + Titel
+      axes3d()
+      title3d(xlab = x_col[1],
+              ylab = x_col[2],
+              zlab = target_col,
+              main = "3D plot with estimated mu ")
+
+      cat("\nTo access the plot, use the command rglwidget()")
     }
     else {
       message("Plotting not possible for > 2 input features")
     }
 
 
-  }
 
+  }
   invisible(object)
 }
