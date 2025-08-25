@@ -10,6 +10,8 @@ forward_feature_net <- function(x_j, params, j, dropout_rate = 0, training = FAL
 
   arch <- attr(params, "architecture")
   n_layers <- arch$n_layers
+  batch_size <- ncol(x_j)
+  ones <- matrix(1, nrow = 1, ncol = batch_size)
 
   # Cache für dieses Subnetz initialisieren
   cache_j <- list()
@@ -22,7 +24,7 @@ forward_feature_net <- function(x_j, params, j, dropout_rate = 0, training = FAL
     W_name <- paste0("W", j, "_", l)
     b_name <- paste0("b", j, "_", l)
 
-    z <- params[[W_name]] %*% a + params[[b_name]]
+    z <- params[[W_name]] %*% a + params[[b_name]] %*% ones
     cache_j[[paste0("Z", l)]] <- z
 
     if (l < n_layers) {
