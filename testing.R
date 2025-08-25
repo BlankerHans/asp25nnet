@@ -115,31 +115,31 @@ polygon(
 )
 
 
-# Non-linear data & heteroskedasticity
-
-set.seed(42)
-n     <- 1000
-x     <- runif(n, 0, 10)
-mu    <- 5 * sin(x)
-sigma <- 0.5 + 0.3 * x
-eps   <- rnorm(n, 0, sigma)
-y     <- mu + eps
-df    <- data.frame(x = x, y = y, mu = mu, sigma = sigma)
-
-ord   <- order(df$x)
-plot(df$x, df$y, pch = 16, cex = 0.6, xlab = "x", ylab = "y", main = "Nicht‐linear + Heteroskedastisch")
-
-
-View(df)
-sim_split <- random_split(df['x'], normalization=FALSE)
-sim_targets <- df$y
-
-train_sim <- sim_split$train
-val_sim <- sim_split$validation
-val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
-
-
-sim_loader <- DataLoader(train_sim, batch_size = 1024)
+# # Non-linear data & heteroskedasticity
+#
+# set.seed(42)
+# n     <- 1000
+# x     <- runif(n, 0, 10)
+# mu    <- 5 * sin(x)
+# sigma <- 0.5 + 0.3 * x
+# eps   <- rnorm(n, 0, sigma)
+# y     <- mu + eps
+# df    <- data.frame(x = x, y = y, mu = mu, sigma = sigma)
+#
+# ord   <- order(df$x)
+# plot(df$x, df$y, pch = 16, cex = 0.6, xlab = "x", ylab = "y", main = "Nicht‐linear + Heteroskedastisch")
+#
+#
+# View(df)
+# sim_split <- random_split(df['x'], normalization=FALSE)
+# sim_targets <- df$y
+#
+# train_sim <- sim_split$train
+# val_sim <- sim_split$validation
+# val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
+#
+#
+# sim_loader <- DataLoader(train_sim, batch_size = 1024)
 
 
 model3 <- train(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(50),optimizer="adam", epochs=2000, lr=0.01)
@@ -147,7 +147,6 @@ class(model3)
 summary.NN(model3, show_plot=TRUE, yscale="robust", drop_first=10)
 
 
-train_namlss(sim_loader, sim_targets, 1,  c(50, 20), t(val_sim), val_sim_targets, optimizer="adam", epochs=2000, lr=0.01)
 
 fwd_sim <- forward(t(df['x']), model3$params)
 mu_sim <- fwd_sim$mu
@@ -189,3 +188,13 @@ lapply(params, dim)
 
 
 forward_variable(sim_loader[[1]]$batch, params)
+
+
+
+
+
+
+# Testing NAMLSS ----------------------------------------------------------
+
+nam <- train_namlss(sim_loader, sim_targets, 1,  c(50, 20), t(val_sim), val_sim_targets, optimizer="adam", epochs=2000, lr=0.01)
+

@@ -27,8 +27,8 @@ backprop_namlss <- function(X, y, fwd, params, dropout_rate = 0) {
   # d/dx softplus(x) = d/dx log(1 + exp(x)) = exp(x)/(1 + exp(x)) = sigmoid(x)
   dL_dsigma_raw <- dL_dsigma * sigmoid(sigma_raw)
 
-  grads$dbeta_mu <- sum(dL_dmu)
-  grads$dbeta_sigma <- sum(dL_dsigma_raw)
+  grads$dbeta_mu <- sum(dL_dmu) / batch_size
+  grads$dbeta_sigma <- sum(dL_dsigma_raw) / batch_size
 
   # Backprop durch jedes Subnetz
   for (j in 1:n_features) {

@@ -42,7 +42,7 @@ init_namlss_params <- function(n_features, hidden_neurons = c(250, 50, 25)) {
   attr(params, "architecture") <- list(
     n_features = n_features,
     n_h = hidden_neurons,
-    n_layers = length(hidden_neurons)
+    n_layers = n_layers
   )
 
   return(params)
