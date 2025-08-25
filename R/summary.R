@@ -145,6 +145,23 @@ summary.NN <- function(object,
     }
 
 
+    #Prediction plot: 2 Inputs
+    else if (nr_inputs == 2) {
+    x1 <- data[[x_col[1]]]
+    x2 <- data[[x_col[2]]]
+    y <- data[[target_col]]
+
+    #Scatterplot
+    scatterplot3d::scatterplot3d(
+      x1, x2, y,
+      xlab = x_col[1], ylab = x_col[2], zlab = target_col,
+      main = "3D plot with model predictions"
+    )
+    # ToDos: Plot schöner machen, evtl andere plottingfunktion, prediction hinzufügen
+    }
+    else {
+      message("Plotting not possible for > 2 input features")
+    }
 
 
   }
