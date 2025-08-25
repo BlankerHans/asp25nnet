@@ -152,7 +152,8 @@ train <- function(
     epochs = epochs,
     lr = lr,
     optimizer = optimizer,
-    normalization = normalization_params
+    normalization = normalization_params,
+    targets = targets
   )
   if (!is.null(history_val)) out$val_loss <- history_val
 

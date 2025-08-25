@@ -12,8 +12,8 @@ val_abdom_targets <- abdom_targets[as.integer(rownames(val_abdom))]
 abdom_loader <- DataLoader(train_abdom, batch_size = 256)
 
 model <- train(abdom_loader, abdom_targets, t(val_abdom), val_abdom_targets, c(50), optimizer="adam", epochs=500, lr=0.01)
-summary.NN(model, data, "y", yscale="robust", drop_first=10)
-
+#summary.NN(model, data, "y", yscale="robust", drop_first=10)
+eval.NN(model, abdom_split)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Summary function test with normalization
 load_all()
@@ -96,27 +96,3 @@ summary.NN(model, df_whole, "y", yscale="robust", drop_first=10)
 rglwidget()
 #-------------------------------------------------------------
 
-x1 <- data[[x_col[1]]]
-x2 <- data[[x_col[2]]]
-y <- data[[target_col]]
-
-open3d()
-plot3d(x1, x2, y,
-       col = "blue",
-       type ="s",
-       radius = .5,
-       size = 5)
-
-# Achsen + Titel
-axes3d()
-title3d(xlab = x_col[1],
-        ylab = x_col[2],
-        zlab = target_col,
-        #main = "3D Fit"
-)
-
-
-
-
-# Datensatz zusammenfassen
-df_whole <- data.frame(x1 = x1, x2 = x2, y = y)
