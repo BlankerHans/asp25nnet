@@ -101,6 +101,7 @@ summary.NAMLSS <- function(object,
   }
 
   # --- Summary Kopf ---
+  cat("==============================\n")
   cat("-- NAMLSS Model Summary --\n")
   cat("==============================\n\n")
   arch_print_ (object)

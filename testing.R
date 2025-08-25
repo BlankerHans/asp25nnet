@@ -196,7 +196,9 @@ forward_variable(sim_loader[[1]]$batch, params)
 
 # Testing NAMLSS ----------------------------------------------------------
 
-nam <- train_namlss(sim_loader, sim_targets, 1,  c(50), t(val_sim), val_sim_targets, optimizer="adam", epochs=2000, lr=0.001, dropout_rate=0.1, lr_decay=0.99)
+nam <- train_namlss(sim_loader, sim_targets, 1,  c(50), t(val_sim), val_sim_targets,
+                    optimizer="adam", epochs=3000, lr=0.001,
+                    dropout_rate=0, lr_decay=0.95, lr_patience=100)
 
 #View(df)
 df_var <- df[, c("x", "y")]

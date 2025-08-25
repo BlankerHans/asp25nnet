@@ -33,7 +33,9 @@ forward_namlss <- function(X, params, dropout_rate = 0, training = FALSE) {
 
   # h^(k)
   mu <- mu_raw
-  sigma <- Softplus(sigma_raw)
+
+  stability_const <- if (!is.null(params$sigma_floor)) params$sigma_floor else 0
+  sigma <- Softplus(sigma_raw) + stability_const
   log_sigma <- log(sigma + 1e-8)
 
   global_cache$mu_raw <- mu_raw

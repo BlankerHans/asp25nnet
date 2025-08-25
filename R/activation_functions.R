@@ -47,6 +47,8 @@ Softplus <- function(x) {
   return(log(1 + exp(x)))
 }
 
+inv_softplus <- function(y) log(expm1(y)) # numerische stabilität in NAMLSS
+
 #' ELU Activation Function
 #'
 #' Computes the Exponential Linear Unit (ELU): \eqn{x} if \eqn{x > 0}, else \eqn{alpha * (exp(x) - 1)}.

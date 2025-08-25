@@ -5,7 +5,7 @@
 #' @return List of weight matrices and bias vectors for all layers
 #' @export
 init_params <- function(dimensions_list, seed = 42) {
-  set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
 
   n_x <- dimensions_list$n_x  # Input dimension
   n_h <- dimensions_list$n_h  # Vector of hidden layer sizes

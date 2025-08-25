@@ -31,7 +31,8 @@ train_namlss <- function(train_loader, targets, n_features,
   optimizer <- match.arg(optimizer)
 
   # Initialisiere Parameter
-  params <- init_namlss_params(n_features, hidden_neurons)
+  params <- init_namlss_params(n_features, hidden_neurons, mean(targets),
+                               sd(targets), sd(targets))
   arch <- attr(params, "architecture")
 
   # Adam Optimizer Setup
