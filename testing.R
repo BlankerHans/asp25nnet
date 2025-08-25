@@ -146,6 +146,9 @@ model3 <- train(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(50),opti
 class(model3)
 summary.NN(model3, show_plot=TRUE, yscale="robust", drop_first=10)
 
+
+train_namlss(sim_loader, sim_targets, 1, t(val_sim), c(50), val_sim_targets, optimizer="adam", epochs=2000, lr=0.01)
+
 fwd_sim <- forward(t(df['x']), model3$params)
 mu_sim <- fwd_sim$mu
 sigma_sim <- exp(fwd_sim$log_sigma)
