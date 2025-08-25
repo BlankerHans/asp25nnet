@@ -52,7 +52,8 @@ backprop_namlss <- function(X, y, fwd, params, dropout_rate = 0) {
 
       # Weight Gradienten berechnen
       grads[[dW_name]] <- delta %*% t(A_prev) / batch_size
-      grads[[db_name]] <- rowSums(delta) / batch_size
+      grads[[db_name]] <- matrix(rowSums(delta) / batch_size,
+                                 nrow = nrow(delta), ncol = 1)
 
       # Backprop zu vorheriger Schicht
       if (l > 1) {

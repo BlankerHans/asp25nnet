@@ -1,3 +1,4 @@
+#' Plots architecture for DNN (NN class)
 plot_architecture <- function(model) {
   if ("architecture" %in% names(model)) {
     arch <- model$architecture

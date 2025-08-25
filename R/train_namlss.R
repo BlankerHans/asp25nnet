@@ -21,7 +21,7 @@
 train_namlss <- function(train_loader, targets, n_features,
                          hidden_neurons = c(250, 50, 25),
                          val_split = NULL, val_targets = NULL,
-                         epochs = 100, lr = 1e-4,
+                         epochs = 100, lr = 0.01,
                          optimizer = c("adam", "sgd"),
                          dropout_rate = 0.5,
                          beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
@@ -88,7 +88,7 @@ train_namlss <- function(train_loader, targets, n_features,
       )
 
       # Backpropagation mit Cache
-      grads <- backprop_namlss(Xb, yb, fwd, params)
+      grads <- backprop_namlss(Xb, yb, fwd, params, dropout_rate)
 
       # Parameter Update
       if (optimizer == "sgd") {
