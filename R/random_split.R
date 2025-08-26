@@ -4,7 +4,8 @@
 #' according to the specified proportions. It optionally normalizes all subsets based
 #' on the mean and standard deviation of the training set.
 #'
-#' @param data A data frame or matrix containing the dataset to split.
+#' @param data A data frame or matrix containing the dataset to split. Just use the
+#' features, not the target variable.
 #' @param split Numeric vector of length 3 specifying the proportions for the training,
 #' validation, and test sets. Must sum to 1. Default is c(0.6, 0.2, 0.2).
 #' @param normalization Logical indicating whether to normalize the subsets based on

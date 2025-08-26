@@ -23,7 +23,8 @@ train <- function(
     epochs = 100, lr = 0.01,
     optimizer = c("sgd", "adam"),
     beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
-    normalization_params = NULL # was macht diese Variable??
+    normalization_params = NULL # <- kommt aus random_split schaue, dass das
+    # übergeben wird und in den summaries mit prediction genutzt wird.
 ) {
   optimizer <- match.arg(optimizer)
 

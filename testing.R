@@ -115,7 +115,9 @@ polygon(
 )
 
 
-# Non-linear data & heteroskedasticity
+
+# Non-linear data & heteroskedasticity ------------------------------------
+
 
 set.seed(42)
 n     <- 1000
@@ -196,6 +198,7 @@ forward_variable(sim_loader[[1]]$batch, params)
 
 # Testing NAMLSS ----------------------------------------------------------
 
+# NAM vs NN on syntethic heteros. & non-linearity data
 nam <- train_namlss(sim_loader, sim_targets, 1,  c(50), t(val_sim), val_sim_targets,
                     optimizer="adam", epochs=3000, lr=0.001,
                     dropout_rate=0, lr_decay=0.95, lr_patience=100)
@@ -214,3 +217,36 @@ test <- summary.NAMLSS(nam,
         max_features = 6,
         ci_z = 1.96)
 
+# California Housing Data
+# ca_housing[ , setdiff(names(ca_housing), "target")] alles außer target
+
+# reduced_df <- ca_housing[, c("MedInc", "HouseAge", "AveRooms", "Population", "target"), drop = FALSE]
+reduced_df <- ca_housing[, c("MedInc", "target"), drop = FALSE]
+input_vars <- reduced_df[, setdiff(names(reduced_df), "target"), drop = FALSE]
+
+ca_housing_split <- random_split(input_vars, normalization=TRUE)
+
+# median house value for California districts, in $100,000
+targets_ca_housing <- ca_housing$target
+
+train_ca_housing <- ca_housing_split$train
+
+val_ca_housing <- ca_housing_split$validation
+# val_targets vielleicht noch automatisch erkennen mit in train aufnehmen!?
+val_targets_ca_housing <- targets_ca_housing[as.integer(rownames(val_ca_housing))]
+
+ca_housing_loader <- DataLoader(train_ca_housing, batch_size = 1024)
+
+nam_housing <- train_namlss(ca_housing_loader, targets_ca_housing, 1,  c(32, 16), t(val_ca_housing), val_targets_ca_housing,
+                    optimizer="adam", epochs=2000, lr=0.001,
+                    dropout_rate=0.1, lr_decay=0.95, lr_patience=10)
+summary.NAMLSS(nam_housing,
+               data = reduced_df,             # DataFrame mit x-Spalten + Zielspalte
+               target_col = "target",      # Name der Zielspalte
+               show_plot = TRUE,
+               yscale = "robust",       # "auto" | "log" | "robust"
+               cap_quantile = 0.99,
+               drop_first = 1,
+               feature_plots = FALSE,  # partielle Effektplots bei >1 Features
+               max_features = 4,
+               ci_z = 1.96)
