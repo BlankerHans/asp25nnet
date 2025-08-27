@@ -132,8 +132,8 @@ ord   <- order(df$x)
 plot(df$x, df$y, pch = 16, cex = 0.6, xlab = "x", ylab = "y", main = "Nicht‐linear + Heteroskedastisch")
 
 
-View(df)
-sim_split <- random_split(df['x'], normalization=TRUE)
+#View(df)
+sim_split <- random_split(df['x'], normalization=FALSE)
 sim_targets <- df$y
 
 train_sim <- sim_split$train
@@ -146,11 +146,11 @@ sim_loader <- DataLoader(train_sim, batch_size = 32)
 
 model3 <- train(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(50),optimizer="adam", epochs=1000, lr=0.01)
 class(model3)
-summary.NN(model3, df, "y", show_plot=TRUE, yscale="robust", drop_first=10)
+summary.NN(model3, df, "y", show_plot=TRUE, yscale="auto", drop_first=0)
 
 
 
-fwd_sim <- forward(t(df['x']), model3$params)
+# fwd_sim <- forward(t(df['x']), model3$params)
 mu_sim <- fwd_sim$mu
 sigma_sim <- exp(fwd_sim$log_sigma)
 
