@@ -133,7 +133,7 @@ plot(df$x, df$y, pch = 16, cex = 0.6, xlab = "x", ylab = "y", main = "Nicht‐li
 
 
 View(df)
-sim_split <- random_split(df['x'], normalization=FALSE)
+sim_split <- random_split(df['x'], normalization=TRUE)
 sim_targets <- df$y
 
 train_sim <- sim_split$train
@@ -141,7 +141,7 @@ val_sim <- sim_split$validation
 val_sim_targets <- sim_targets[as.integer(rownames(val_sim))]
 
 
-sim_loader <- DataLoader(train_sim, batch_size = 1024)
+sim_loader <- DataLoader(train_sim, batch_size = 32)
 
 
 model3 <- train(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(50),optimizer="adam", epochs=1000, lr=0.01)
@@ -237,7 +237,7 @@ val_targets_ca_housing <- targets_ca_housing[as.integer(rownames(val_ca_housing)
 
 ca_housing_loader <- DataLoader(train_ca_housing, batch_size = 1024)
 
-nam_housing <- train_namlss(ca_housing_loader, targets_ca_housing, 1,  c(32, 16), t(val_ca_housing), val_targets_ca_housing,
+nam_housing <- train_namlss(ca_housing_loader, targets_ca_housing, 1,  c(50), t(val_ca_housing), val_targets_ca_housing,
                     optimizer="adam", epochs=2000, lr=0.001,
                     dropout_rate=0.1, lr_decay=0.95, lr_patience=10)
 summary.NAMLSS(nam_housing,

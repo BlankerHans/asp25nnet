@@ -81,11 +81,16 @@ random_split <- function(data, split = c(0.6, 0.2, 0.2), normalization = TRUE) {
       val_norm <- normalize(validation, mean_train, sd_train)
       test_norm <- normalize(test, mean_train, sd_train)
 
+      np <- list(mean = mean_train, sd = sd_train)
+      attr(train_norm, "normalization_params") <- np
+      attr(val_norm, "normalization_params") <- np
+      attr(test_norm, "normalization_params") <- np
+
       return(list(
         train = train_norm,
         validation = val_norm,
         test = test_norm,
-        normalization_params = list(mean = mean_train, sd = sd_train)
+        normalization_params = np
       ))
 
     } else {

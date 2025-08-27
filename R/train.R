@@ -22,9 +22,7 @@ train <- function(
     val_split = NULL, val_targets = NULL, hidden_neurons,
     epochs = 100, lr = 0.01,
     optimizer = c("sgd", "adam"),
-    beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
-    normalization_params = NULL # <- kommt aus random_split schaue, dass das
-    # übergeben wird und in den summaries mit prediction genutzt wird.
+    beta1 = 0.9, beta2 = 0.999, eps = 1e-8
 ) {
   optimizer <- match.arg(optimizer)
 
@@ -33,6 +31,8 @@ train <- function(
   params <- init_params(dimensions)
   arch <- attr(params, "architecture")
   n_layers <- arch$n_layers
+
+  normalization_params <- train_loader[[1]]$normalization_params
 
   # Initialize Adam optimizer states if needed
   if (optimizer == "adam") {

@@ -30,11 +30,18 @@ DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
   # Shuffle data, generate start indices for batches (e.g. 1, 33, 65 with batch_size=32)
   # Extract rows for each batch, transpose batches and return them with data point indices
 
+  if (!is.null(attr(data, "normalization_params"))) {
+    normalization_params <- attr(data, "normalization_params")
+  } else {
+    normalization_params <- NULL
+  }
+
   data <- as.matrix(data)
 
   if (shuffle) {
     data <- data[sample(nrow(data)), , drop = FALSE]
   }
+
 
   n <- nrow(data)
   # Start indices for batches: 1, 1+batch_size, 1+2*batch_size, …
@@ -47,7 +54,8 @@ DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
     idx   <- as.integer(colnames(mat_t))
     list(
       batch = mat_t,
-      idx = idx
+      idx = idx,
+      normalization_params = normalization_params
     )
   })
 
