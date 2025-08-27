@@ -126,7 +126,7 @@ mu    <- 5 * sin(x)
 sigma <- 0.5 + 0.3 * x
 eps   <- rnorm(n, 0, sigma)
 y     <- mu + eps
-df    <- data.frame(x = x, y = y, mu = mu, sigma = sigma)
+df    <- data.frame(x = x, y = y)
 
 ord   <- order(df$x)
 plot(df$x, df$y, pch = 16, cex = 0.6, xlab = "x", ylab = "y", main = "Nicht‐linear + Heteroskedastisch")
@@ -146,7 +146,7 @@ sim_loader <- DataLoader(train_sim, batch_size = 32)
 
 model3 <- train(sim_loader, sim_targets, t(val_sim), val_sim_targets, c(50),optimizer="adam", epochs=1000, lr=0.01)
 class(model3)
-summary.NN(model3, show_plot=TRUE, yscale="robust", drop_first=10)
+summary.NN(model3, df, "y", show_plot=TRUE, yscale="robust", drop_first=10)
 
 
 

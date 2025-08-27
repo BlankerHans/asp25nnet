@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary.R
 \name{summary.NN}
 \alias{summary.NN}
-\title{Summary für NN-Objekte}
+\title{Summary of a Trained Neural Network Model}
 \usage{
 \method{summary}{NN}(
   object,
@@ -15,10 +15,41 @@
 )
 }
 \arguments{
-\item{object}{Ein NN-Objekt}
+\item{object}{Trained neural network model object containing parameters,
+optimizer, learning rate, epochs, losses, and optional normalization info.}
 
-\item{...}{weitere Argumente}
+\item{data}{Data frame used for model evaluation, including predictors and target.}
+
+\item{target_col}{Character string with the name of the target variable.}
+
+\item{show_plot}{Logical; if TRUE, plots of losses and predictions are shown. Default is TRUE.}
+
+\item{yscale}{Character; determines y-axis scaling for loss plots:
+\code{"auto"} (linear), \code{"log"} (logarithmic), \code{"robust"} (capped at quantile).}
+
+\item{cap_quantile}{Numeric (0–1); quantile for robust loss capping. Default is 0.99.}
+
+\item{drop_first}{Integer; number of initial epochs to exclude from loss plots. Default is 0.}
+}
+\value{
+Invisibly returns the input \code{object} after printing and optionally plotting
+summaries, losses, and model predictions.
 }
 \description{
-Summary für NN-Objekte
+Provides a summary of a trained neural network, including its
+architecture, training setup, losses, and visualizations of model fit.
+Depending on the number of input features, it generates either 2D or 3D plots.
+}
+\examples{
+\dontrun{
+# Assuming `nn_model` is a trained neural network object
+summary.NN(
+  object = nn_model,
+  data = mydata,
+  target_col = "y",
+  show_plot = TRUE,
+  yscale = "auto"
+)
+}
+
 }
