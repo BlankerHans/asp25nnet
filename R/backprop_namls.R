@@ -1,13 +1,32 @@
-#' Backpropagation für NAMLSS
+#' Backpropagation for NAMLS Model
 #'
-#' @param X Input Matrix (n_features x batch_size)
-#' @param y Target Werte
-#' @param fwd Forward Pass Ergebnisse
-#' @param params Modellparameter
-#' @param dropout_rate Dropout Rate
-#' @return Liste mit Gradienten
+#' Computes gradients of the loss function with respect to all model parameters
+#' in a NAMLS network using backpropagation. Supports dropout, ReLU activations,
+#' and subnet-specific weight updates.
+#'
+#' @param X Numeric matrix of input features (predictors), with columns as samples
+#'   and rows as features.
+#' @param y Numeric vector of target values, same length as number of columns in `X`.
+#' @param fwd List; result of a forward pass (`forward_namls()`), containing cached
+#'   activations, outputs, and intermediate values.
+#' @param params List of model parameters (weights and biases) for all subnetworks.
+#' @param dropout_rate Numeric (0–1); dropout rate applied in hidden layers. Default is 0.
+#'
+#' @return A list of gradients (`grads`) for all model parameters, including
+#'   weights, biases, and global coefficients (`beta_mu`, `beta_sigma`).
+#'
+#' @examples
+#' \dontrun{
+#' # Forward pass
+#' fwd <- forward_namls(X, params)
+#'
+#' # Backpropagation
+#' grads <- backprop_namls(X, y, fwd, params, dropout_rate = 0.2)
+#' }
+#'
 #' @export
-backprop_namlss <- function(X, y, fwd, params, dropout_rate = 0) {
+
+backprop_namls <- function(X, y, fwd, params, dropout_rate = 0) {
 
   cache <- fwd$cache
   n_features <- cache$n_features

@@ -1,4 +1,4 @@
-#' Train NAMLSS
+#' Train NAMLS
 #'
 #' @param train_loader DataLoader mit Trainingsdaten
 #' @param targets Alle Zielwerte
@@ -18,7 +18,7 @@
 #' @param verbose Fortschritt anzeigen
 #' @return Trainiertes Modell
 #' @export
-train_namlss <- function(train_loader, targets, n_features,
+train_namls <- function(train_loader, targets, n_features,
                          hidden_neurons = c(250, 50, 25),
                          val_split = NULL, val_targets = NULL,
                          epochs = 100, lr = 0.01,
@@ -31,7 +31,7 @@ train_namlss <- function(train_loader, targets, n_features,
   optimizer <- match.arg(optimizer)
 
   # Initialisiere Parameter
-  params <- init_namlss_params(n_features, hidden_neurons, mean(targets),
+  params <- init_namls_params(n_features, hidden_neurons, mean(targets),
                                sd(targets), sd(targets))
   arch <- attr(params, "architecture")
 
@@ -80,7 +80,7 @@ train_namlss <- function(train_loader, targets, n_features,
       batch_sizes[i] <- length(yb)
 
       # Forward Pass mit Cache
-      fwd <- forward_namlss(Xb, params, dropout_rate, training = TRUE)
+      fwd <- forward_namls(Xb, params, dropout_rate, training = TRUE)
 
       # Loss berechnen
       batch_losses[i] <- neg_log_lik(
@@ -89,7 +89,7 @@ train_namlss <- function(train_loader, targets, n_features,
       )
 
       # Backpropagation mit Cache
-      grads <- backprop_namlss(Xb, yb, fwd, params, dropout_rate)
+      grads <- backprop_namls(Xb, yb, fwd, params, dropout_rate)
 
       # Parameter Update
       if (optimizer == "sgd") {
@@ -181,7 +181,7 @@ train_namlss <- function(train_loader, targets, n_features,
 
     # Validierung
     if (!is.null(val_split)) {
-      fwd_val <- forward_namlss(val_split, params,
+      fwd_val <- forward_namls(val_split, params,
                                            dropout_rate = 0, training = FALSE)
       history_val[e] <- neg_log_lik(
         val_targets, fwd_val$mu, fwd_val$log_sigma,
@@ -238,7 +238,7 @@ train_namlss <- function(train_loader, targets, n_features,
     cat("Training completed!\n")
     cat("===============================================\n")
     arch_str <- paste(c(1, arch$n_h, 2), collapse = " -> ")
-    cat(sprintf("NAMLSS with %d feature networks\n", n_features))
+    cat(sprintf("NAMLS with %d feature networks\n", n_features))
     cat(sprintf("Each network: %s\n", arch_str))
 
     # Parameter Anzahl
@@ -274,7 +274,7 @@ train_namlss <- function(train_loader, targets, n_features,
     best_val_loss = if (!is.null(val_split)) min(history_val) else NULL
   )
 
-  class(model) <- c("NAMLSS", class(model))
+  class(model) <- c("NAMLS", class(model))
   attr(model$params, "architecture") <- arch
 
   return(model)
