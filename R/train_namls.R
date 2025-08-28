@@ -69,9 +69,6 @@ train_namls <- function(train_loader, targets, n_features,
 
   # Early-Stopping / Best-Weights Zustände
   es_wait <- 0
-  es_patience <- es_patience
-  es_min_delta <- es_min_delta
-  es_warmup <- es_warmup
   best_params <- NULL
   best_val_loss <- Inf
   best_epoch <- NA_integer_
@@ -209,7 +206,7 @@ train_namls <- function(train_loader, targets, n_features,
         best_val_loss <- history_val[e]
         es_wait <- 0
         best_epoch <- e
-        if (restore_best_weights) best_params <- params
+        if (restore_best_weights) best_params <- unserialize(serialize(params, NULL))
       } else {
         es_wait <- es_wait + 1
       }
