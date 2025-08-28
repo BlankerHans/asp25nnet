@@ -16,6 +16,10 @@
 #' @param lr_decay Learning rate decay factor
 #' @param lr_patience Epochs to wait before decay
 #' @param verbose Fortschritt anzeigen
+#' @param es_patience Epochs without improvement (Default 20)
+#' @param es_min_delta Improvement Criterion (Default 0)
+#' @param es_warmup Epoch when early stopping should start (Default 50)
+#' @param restore_best_weights Do you want to store best weights? (Default TRUE)
 #' @return Trainiertes Modell
 #' @export
 train_namls <- function(train_loader, targets, n_features,
@@ -26,7 +30,8 @@ train_namls <- function(train_loader, targets, n_features,
                          dropout_rate = 0.5,
                          beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
                          lr_decay = 0.95, lr_patience = 10,
-                         verbose = TRUE) {
+                         verbose = TRUE, es_patience=20, es_min_delta=0,
+                        es_warmup=50, restore_best_weights = TRUE) {
 
   optimizer <- match.arg(optimizer)
 
@@ -61,7 +66,16 @@ train_namls <- function(train_loader, targets, n_features,
   # Learning Rate Scheduler Setup
   lr_current <- lr
   lr_counter <- 0
+
+  # Early-Stopping / Best-Weights Zustände
+  es_wait <- 0
+  es_patience <- es_patience
+  es_min_delta <- es_min_delta
+  es_warmup <- es_warmup
+  best_params <- NULL
   best_val_loss <- Inf
+  best_epoch <- NA_integer_
+
 
   # Training History
   history_train <- numeric(epochs)
@@ -188,9 +202,20 @@ train_namls <- function(train_loader, targets, n_features,
         reduction = "mean"
       )
 
-      # Learning Rate Scheduler
-      if (history_val[e] < best_val_loss) {
+      prev_best <- best_val_loss
+      improved  <- (history_val[e] < (prev_best - es_min_delta))
+
+      if (improved) {
         best_val_loss <- history_val[e]
+        es_wait <- 0
+        best_epoch <- e
+        if (restore_best_weights) best_params <- params
+      } else {
+        es_wait <- es_wait + 1
+      }
+
+      # Learning Rate Scheduler
+      if (history_val[e] < prev_best) {
         lr_counter <- 0
       } else {
         lr_counter <- lr_counter + 1
@@ -218,17 +243,17 @@ train_namls <- function(train_loader, targets, n_features,
       }
     }
 
-    # Early Stopping Check
-    if (!is.null(val_split) && e > 50) {
-      # Prüfe ob Validierung sich verbessert
-      if (e > 20 && all(diff(tail(history_val, 20)) > 0)) {
-        if (verbose) {
-          cat("Early stopping: Validation loss not improving for 20 epochs\n")
-        }
-        history_train <- history_train[1:e]
-        history_val <- history_val[1:e]
-        break
+    if (e >= es_warmup && es_wait >= es_patience) {
+      if (verbose) {
+        cat(sprintf("Early stopping after %d epochs without val improvement. Best val: %.6f @ epoch %d\n",
+                    es_wait, best_val_loss, best_epoch))
       }
+      if (restore_best_weights && !is.null(best_params)) {
+        params <- best_params
+      }
+      history_train <- history_train[1:e]
+      history_val   <- history_val[1:e]
+      break
     }
   }
 
