@@ -250,3 +250,52 @@ summary.NAMLSS(nam_housing,
                feature_plots = FALSE,  # partielle Effektplots bei >1 Features
                max_features = 4,
                ci_z = 1.96)
+
+
+
+# Insurance Data ----------------------------------------------------------
+
+
+# insurance[ , setdiff(names(insurance), "charges")] alles außer target
+
+# reduced_df <- ca_housing[, c("MedInc", "HouseAge", "AveRooms", "Population", "target"), drop = FALSE]
+reduced_df <- insurance[, c("age", "charges"), drop = FALSE]
+input_vars <- reduced_df[, setdiff(names(reduced_df), "charges"), drop = FALSE]
+
+insurance_split <- random_split(input_vars, normalization=FALSE)
+
+# charges => target
+targets_insurance <- insurance$charges
+
+train_insurance <- insurance_split$train
+
+val_insurance <- insurance_split$validation
+# val_targets vielleicht noch automatisch erkennen mit in train aufnehmen!?
+val_targets_insurance <- targets_insurance[as.integer(rownames(val_insurance))]
+
+insurance_loader <- DataLoader(train_insurance, batch_size = 128)
+
+dnn_insurance <- train(insurance_loader, targets_insurance, t(val_insurance), val_targets_insurance, c(30),optimizer="adam", epochs=5000, lr=0.001)
+summary.NN(dnn_insurance,
+           data = reduced_df,             # DataFrame mit x-Spalten + Zielspalte
+           target_col = "charges",      # Name der Zielspalte
+           show_plot = TRUE,
+           yscale = "robust",       # "auto" | "log" | "robust"
+           cap_quantile = 0.99,
+           drop_first = 1)
+
+
+nam_insurance <- train_namlss(insurance_loader, targets_insurance, 1,  c(50), t(val_insurance), val_targets_insurance,
+                            optimizer="adam", epochs=5000, lr=0.001,
+                            dropout_rate=0, lr_decay=0.99, lr_patience=10)
+summary.NAMLSS(nam_insurance,
+               data = reduced_df,             # DataFrame mit x-Spalten + Zielspalte
+               target_col = "target",      # Name der Zielspalte
+               show_plot = TRUE,
+               yscale = "robust",       # "auto" | "log" | "robust"
+               cap_quantile = 0.99,
+               drop_first = 1,
+               feature_plots = FALSE,  # partielle Effektplots bei >1 Features
+               max_features = 4,
+               ci_z = 1.96)
+

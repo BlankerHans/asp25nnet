@@ -19,7 +19,7 @@
 #' @export
 train <- function(
     train_loader, targets,
-    val_split = NULL, val_targets = NULL, hidden_neurons,
+    val_split = NULL, val_targets = NULL, hidden_neurons=c(50),
     epochs = 100, lr = 0.01,
     optimizer = c("sgd", "adam"),
     beta1 = 0.9, beta2 = 0.999, eps = 1e-8

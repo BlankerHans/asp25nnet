@@ -45,3 +45,26 @@ neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw")) {
     return(loss_i)
   }
 }
+
+neg_log_lik_invgamma <- function(y, log_alpha, log_beta, reduction = c("sum","mean","raw")) {
+
+  reduction <- match.arg(reduction)
+
+  alpha <- exp(log_alpha)
+  beta <- exp(log_beta)
+
+  n <- length(y)
+
+  # log(L(α, β|y)) = -n(α + 1)log(y) - n*log(Γ(α)) + n*α*log(β) - Σ(β/y_i)
+  # Für neg log-lik multiplizieren wir mit -1
+
+  loss_i <- (alpha + 1) * log(y) + lgamma(alpha) - alpha * log(beta) + beta/y
+
+  if (reduction == "sum") {
+    return(sum(loss_i))
+  } else if (reduction == "mean") {
+    return(mean(loss_i))
+  } else {  # reduction == "raw"
+    return(loss_i)
+  }
+}
