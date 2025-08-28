@@ -1,14 +1,14 @@
 # ---- Helper -------------------------------------------------------------
 Softplus_ <- function(z) log1p(exp(-abs(z))) + pmax(z, 0)
 
-#' Summary of a Trained NAMLSS Model
+#' Summary of a Trained NAMLS Model
 #'
-#' Provides a summary of a trained NAMLSS model, including its architecture,
+#' Provides a summary of a trained NAMLS model, including its architecture,
 #' training setup, training results, and visualizations of model predictions.
 #' Depending on the number of input features, it produces loss curves,
 #' 1D fits with confidence intervals, or partial effect plots for multiple features.
 #'
-#' @param object Trained NAMLSS model object containing parameters, optimizer, learning rate,
+#' @param object Trained NAMLS model object containing parameters, optimizer, learning rate,
 #'   epochs, losses, and optional normalization info.
 #' @param data Data frame used for model evaluation, including predictors and target.
 #' @param target_col Character string with the name of the target variable.
@@ -27,9 +27,9 @@ Softplus_ <- function(z) log1p(exp(-abs(z))) + pmax(z, 0)
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming `namlss_model` is a trained NAMLSS model object
-#' summary.NAMLSS(
-#'   object = namlss_model,
+#' # Assuming `namls_model` is a trained NAMLS model object
+#' summary.NAMLS(
+#'   object = namls_model,
 #'   data = mydata,
 #'   target_col = "y",
 #'   show_plot = TRUE,
@@ -39,9 +39,9 @@ Softplus_ <- function(z) log1p(exp(-abs(z))) + pmax(z, 0)
 #' }
 #'
 #' @export
-#' @method summary NAMLSS
+#' @method summary NAMLS
 
-summary.NAMLSS <- function(object,
+summary.NAMLS <- function(object,
                            data,
                            target_col,
                            show_plot = TRUE,
@@ -111,12 +111,12 @@ summary.NAMLSS <- function(object,
 
   # -- Architektur-Print --
   arch_print_ <- function(object) {
-    cat("Feature-Networks:       ", object$n_features, "\n", sep="")
+    cat("Feature networks:       ", object$n_features, "\n", sep="")
     if (!is.null(object$architecture$layer_sizes)) {
       ls <- object$architecture$layer_sizes
-      cat("Subnet-Architektur:     ", paste(ls, collapse=" -> "), "\n", sep="")
+      cat("Subnet architecture:     ", paste(ls, collapse=" -> "), "\n", sep="")
     } else if (!is.null(object$architecture$n_h)) {
-      cat("Subnet-Architektur:     ",
+      cat("Subnet architekture:     ",
           paste(c(1, object$architecture$n_h, 2), collapse=" -> "), "\n", sep="")
     }
     cat("Optimizer:              ", object$optimizer, "\n", sep="")
@@ -131,7 +131,7 @@ summary.NAMLSS <- function(object,
 
   # ---- Kopf ----
   cat("==============================\n")
-  cat("-- NAMLSS Model Summary --\n")
+  cat("-- NAMLS Model Summary --\n")
   cat("==============================\n\n")
   arch_print_(object)
 
@@ -160,18 +160,18 @@ summary.NAMLSS <- function(object,
   p <- ncol(X_raw)
 
   if (!is.null(object$n_features) && p != object$n_features) {
-    stop(sprintf("Anzahl Features in 'data' (%d) ≠ object$n_features (%d). Reihenfolge/Spalten prüfen!",
+    stop(sprintf("Number of features in 'data' (%d) ≠ object$n_features (%d). Check order/columns!",
                  p, object$n_features))
   }
 
   # ---- Vollvorhersage ----
-  fwd <- forward_namlss(X_t, object$params, dropout_rate = 0, training = FALSE)
+  fwd <- forward_namls(X_t, object$params, dropout_rate = 0, training = FALSE)
   mu_full    <- as.numeric(fwd$mu)
   sigma_full <- as.numeric(fwd$sigma)
 
   # ---- (2) 1-Feature-Plot (Fit + CI) im gleichen Pane ----
   if (p == 1) {
-    cat("\n(2) Vorhersage-Plot (1 Feature)\n------------------------------\n")
+    cat("\n(2) Prediction plot (1 Feature)\n------------------------------\n")
     y <- data[[target_col]]
     x <- X_raw[, 1]
     ord <- order(x)
@@ -183,7 +183,7 @@ summary.NAMLSS <- function(object,
     graphics::par(mfrow = c(1,1))
     graphics::plot(x_s, y_s, pch=16, cex=0.6,
                    xlab = x_cols[1], ylab = target_col,
-                   main = "NAMLSS Fit (μ mit 95% CI)")
+                   main = "NAMLS Fit (μ with 95% CI)")
     graphics::lines(x_s, mu_s, col="red", lwd=2)
     graphics::polygon(c(x_s, rev(x_s)), c(upper, rev(lower)),
                       col = grDevices::rgb(0.2, 0.2, 1, alpha=0.2), border=NA)
@@ -192,9 +192,9 @@ summary.NAMLSS <- function(object,
 
   # ---- (2) Partielle Effekte (alle in EINEM Multi-Panel-Plot im Pane) ----
   if (isTRUE(feature_plots) && p > 1) {
-    cat("\n(2) Partielle Effekte je Feature\n------------------------------\n")
+    cat("\n(2) Partial effects per feature\n------------------------------\n")
     if (!exists("forward_feature_net", mode="function")) {
-      warning("forward_feature_net() nicht gefunden – Feature-Plots werden übersprungen.")
+      warning("forward_feature_net() not found – Feature plots are skipped.")
       return(invisible(object))
     }
 
@@ -234,13 +234,13 @@ summary.NAMLSS <- function(object,
 
       graphics::plot(xjs, mu_j, type="l", lwd=2, col="black",
                      xlab = x_cols[j], ylab = expression(f[mu](x[j])),
-                     main = paste0("Feature ", j, ": μ-Beitrag & σ(partial)"))
+                     main = paste0("Feature ", j, ": μ-contribution & σ(partial)"))
       graphics::grid()
       graphics::par(new = TRUE)
       graphics::plot(xjs, sig_partial, type="l", lwd=1.5, lty=2, col="red",
                      axes=FALSE, xlab="", ylab="")
       graphics::axis(4); graphics::mtext("sigma (partial)", side=4, line=2)
-      graphics::legend("topleft", c("μ-Beitrag","σ (partial)"),
+      graphics::legend("topleft", c("μ-contribution","σ (partial)"),
                        lty=c(1,2), lwd=c(2,1.5), col=c("black","red"), bty="n")
     }
   }

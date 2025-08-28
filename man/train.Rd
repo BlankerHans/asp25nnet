@@ -9,7 +9,7 @@ train(
   targets,
   val_split = NULL,
   val_targets = NULL,
-  hidden_neurons,
+  hidden_neurons = c(50),
   epochs = 100,
   lr = 0.01,
   optimizer = c("sgd", "adam"),
