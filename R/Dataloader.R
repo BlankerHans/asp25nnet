@@ -6,7 +6,7 @@
 #'
 #' @param data A matrix to be processed in batches. (Use the output of the train_val_tes func)
 #' @param batch_size Integer specifying the size of each batch (default is 32).
-#' @param shuffle Logical, whether to shuffle the data before batching (default is TRUE).
+#' @param shuffle Logical, whether to shuffle the data before batching (default is FALSE).
 #'
 #' @return A list of lists, each containing:
 #' \itemize{
@@ -25,7 +25,7 @@
 #' str(batches[[1]])
 #'
 #' @export
-DataLoader <- function(data, batch_size=32, shuffle=TRUE) {
+DataLoader <- function(data, batch_size=32, shuffle=FALSE) {
 
   # Shuffle data, generate start indices for batches (e.g. 1, 33, 65 with batch_size=32)
   # Extract rows for each batch, transpose batches and return them with data point indices

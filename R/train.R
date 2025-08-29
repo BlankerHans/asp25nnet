@@ -24,6 +24,7 @@ train <- function(
     optimizer = c("sgd", "adam"),
     beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
     verbose = TRUE,
+    early_stopping = TRUE,
     es_patience = 20, es_warmup = 50, es_min_delta = 0,
     restore_best_weights = TRUE
 ) {
@@ -58,6 +59,7 @@ train <- function(
   best_params <- NULL
   best_val_loss <- Inf
   best_epoch <- NA_integer_
+
 
 
   history_train <- numeric(epochs)
@@ -166,6 +168,7 @@ train <- function(
 
     # Early Stopping
     # If warm-up period is over and no val improvement over defined epoch nr: stop training
+    if (early_stopping){
     if (e >= es_warmup && es_wait >= es_patience) {
       if (verbose) {
         cat(sprintf("Early stopping after %d epochs without improvement of validation loss. \nBest validation loss: %.6f @ epoch %d\n",
@@ -178,14 +181,22 @@ train <- function(
       history_train <- history_train[1:e]
       history_val   <- history_val[1:e]
       break
+      }
     }
 
   }
+
+  if (verbose) {
+    cat("\n===============================================\n")
+    cat("Training completed!\n")
+
 
   # Display architecture after last epoch
   arch_str <- paste(c(arch$n_x, arch$n_h, arch$n_y), collapse = " -> ")
   message(sprintf("Trained network with architecture: %s", arch_str))
 
+  cat("===============================================\n")
+  }
   # Preserve architecture in params
   attr(params, "architecture") <- arch
 
