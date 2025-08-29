@@ -22,7 +22,10 @@ train <- function(
     val_split = NULL, val_targets = NULL, hidden_neurons=c(50),
     epochs = 100, lr = 0.01,
     optimizer = c("sgd", "adam"),
-    beta1 = 0.9, beta2 = 0.999, eps = 1e-8
+    beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
+    verbose = TRUE,
+    es_patience = 20, es_warmup = 50, es_min_delta = 0,
+    restore_best_weights = TRUE
 ) {
   optimizer <- match.arg(optimizer)
 
@@ -49,6 +52,13 @@ train <- function(
       }
     }
   }
+
+  #Initialize parameters for early stopping
+  es_wait <- 0
+  best_params <- NULL
+  best_val_loss <- Inf
+  best_epoch <- NA_integer_
+
 
   history_train <- numeric(epochs)
   history_val <- if (!is.null(val_split)) numeric(epochs) else NULL
@@ -119,6 +129,7 @@ train <- function(
     # Log losses
     history_train[e] <- weighted.mean(batch_losses, batch_sizes)
 
+    # Calculation of validation loss
     if (!is.null(val_split)) {
       fwd_val <- forward(val_split, params)
       history_val[e] <- neg_log_lik(
@@ -127,8 +138,22 @@ train <- function(
         as.numeric(fwd_val$log_sigma),
         reduction = "mean"
       )
+
+      #If validation loss has improved, reset counter for early stopping
+      prev_best <- best_val_loss
+      improved  <- (history_val[e] < (prev_best - es_min_delta))
+
+      if (improved) {
+        best_val_loss <- history_val[e]
+        es_wait <- 0
+        best_epoch <- e
+        if (restore_best_weights) best_params <- unserialize(serialize(params, NULL))
+      } else {
+        es_wait <- es_wait + 1
+      }
+
       message(sprintf(
-        "Epoch %3d/%d – Train: %.6f | Val: %.6f",
+        "Epoch %3d/%d – Train loss: %.6f | Validation loss: %.6f",
         e, epochs, history_train[e], history_val[e]
       ))
     } else {
@@ -137,6 +162,24 @@ train <- function(
         e, epochs, history_train[e]
       ))
     }
+
+
+    # Early Stopping
+    # If warm-up period is over and no val improvement over defined epoch nr: stop training
+    if (e >= es_warmup && es_wait >= es_patience) {
+      if (verbose) {
+        cat(sprintf("Early stopping after %d epochs without improvement of validation loss. \nBest validation loss: %.6f @ epoch %d\n",
+                    es_wait, best_val_loss, best_epoch))
+      }
+      #If requested, reset params to those that produce best val loss
+      if (restore_best_weights && !is.null(best_params)) {
+        params <- best_params
+      }
+      history_train <- history_train[1:e]
+      history_val   <- history_val[1:e]
+      break
+    }
+
   }
 
   # Display architecture after last epoch
