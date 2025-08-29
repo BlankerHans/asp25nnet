@@ -293,7 +293,8 @@ train_namls <- function(train_loader, targets, n_features,
     final_lr = lr_current,
     optimizer = optimizer,
     dropout_rate = dropout_rate,
-    best_val_loss = if (!is.null(val_split)) min(history_val) else NULL
+    best_val_loss = if (!is.null(val_split)) min(history_val) else NULL,
+    n_params = n_params
   )
 
   class(model) <- c("NAMLS", class(model))

@@ -58,22 +58,26 @@ targets_std_full[as.integer(rownames(val_ca_housing))]   <- val_targets_ca_housi
 targets_std_full[as.integer(rownames(test_ca_housing))]  <- test_targets_ca_housing
 
 
+
 # Model
 
 ca_housing_loader <- DataLoader(train_ca_housing, batch_size = 256)
 
-nam_housing <- train_namls(ca_housing_loader, targets_std_full, 2,  c(50), t(val_ca_housing), val_targets_ca_housing,
+nam_housing <- train_namls(ca_housing_loader, targets_std_full, 2,  c(32, 64, 128, 256), t(val_ca_housing), val_targets_ca_housing,
                            optimizer="adam", epochs=2000, lr=0.001,
-                           dropout_rate=0.1, lr_decay=0.95, lr_patience=10)
-summary.NAMLSS(nam_housing,
+                           dropout_rate=0.1, lr_decay=0.95, lr_patience=50)
+summary.NAMLS(nam_housing,
                data = reduced_df,             # DataFrame mit x-Spalten + Zielspalte
-               target_col = "target",      # Name der Zielspalte
+               target_col = "target", # Name der Zielspalte
+               pm1_scaler = pm1,        # für [-1, 1] Skalierung
+               target_mean = norm_targets$mean,  # für Ziel-Inverse-Transform
+               target_sd = norm_targets$sd,      # für Ziel-Inverse-Transform
                show_plot = TRUE,
                yscale = "robust",       # "auto" | "log" | "robust"
                cap_quantile = 0.99,
                drop_first = 1,
-               feature_plots = FALSE,  # partielle Effektplots bei >1 Features
-               max_features = 4,
+               feature_plots = TRUE,  # partielle Effektplots bei >1 Features
+               max_features = 2,
                ci_z = 1.96)
 
 
