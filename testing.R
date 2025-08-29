@@ -199,7 +199,7 @@ forward_variable(sim_loader[[1]]$batch, params)
 # Testing NAMLSS ----------------------------------------------------------
 
 # NAM vs NN on syntethic heteros. & non-linearity data
-nam <- train_namlss(sim_loader, sim_targets, 1,  c(50), t(val_sim), val_sim_targets,
+nam <- train_namls(sim_loader, sim_targets, 1,  c(50), t(val_sim), val_sim_targets,
                     optimizer="adam", epochs=3000, lr=0.001,
                     dropout_rate=0, lr_decay=0.95, lr_patience=100)
 
@@ -237,7 +237,7 @@ val_targets_ca_housing <- targets_ca_housing[as.integer(rownames(val_ca_housing)
 
 ca_housing_loader <- DataLoader(train_ca_housing, batch_size = 1024)
 
-nam_housing <- train_namlss(ca_housing_loader, targets_ca_housing, 1,  c(50), t(val_ca_housing), val_targets_ca_housing,
+nam_housing <- train_namls(ca_housing_loader, targets_ca_housing, 1,  c(50), t(val_ca_housing), val_targets_ca_housing,
                     optimizer="adam", epochs=2000, lr=0.001,
                     dropout_rate=0.1, lr_decay=0.95, lr_patience=10)
 summary.NAMLSS(nam_housing,
@@ -262,7 +262,7 @@ summary.NAMLSS(nam_housing,
 reduced_df <- insurance[, c("age", "charges"), drop = FALSE]
 input_vars <- reduced_df[, setdiff(names(reduced_df), "charges"), drop = FALSE]
 
-insurance_split <- random_split(input_vars, normalization=FALSE)
+insurance_split <- random_split(input_vars, normalization=TRUE)
 
 # charges => target
 targets_insurance <- insurance$charges
@@ -275,7 +275,9 @@ val_targets_insurance <- targets_insurance[as.integer(rownames(val_insurance))]
 
 insurance_loader <- DataLoader(train_insurance, batch_size = 128)
 
-dnn_insurance <- train(insurance_loader, targets_insurance, t(val_insurance), val_targets_insurance, c(30),optimizer="adam", epochs=5000, lr=0.001)
+dnn_insurance <- train(insurance_loader, targets_insurance,
+                       t(val_insurance), val_targets_insurance,
+                       c(32),optimizer="adam", epochs=10000, lr=0.001)
 summary.NN(dnn_insurance,
            data = reduced_df,             # DataFrame mit x-Spalten + Zielspalte
            target_col = "charges",      # Name der Zielspalte
@@ -285,7 +287,11 @@ summary.NN(dnn_insurance,
            drop_first = 1)
 
 
-nam_insurance <- train_namlss(insurance_loader, targets_insurance, 1,  c(50), t(val_insurance), val_targets_insurance,
+
+
+
+nam_insurance <- train_namls(insurance_loader, targets_insurance, 1,
+                              c(50), t(val_insurance), val_targets_insurance,
                             optimizer="adam", epochs=5000, lr=0.001,
                             dropout_rate=0, lr_decay=0.99, lr_patience=10)
 summary.NAMLSS(nam_insurance,

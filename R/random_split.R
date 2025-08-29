@@ -45,6 +45,7 @@ random_split <- function(data, split = c(0.6, 0.2, 0.2), normalization = TRUE) {
     stop("The sum of `split` must be exactly 1 (you have ", sum(split), ").")
   }
 
+  # Wieso nicht mehr als input auswählbar?
   # Shuffle indices
   n <- nrow(data)
   idx_all <- sample(n)

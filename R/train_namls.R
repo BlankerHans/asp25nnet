@@ -35,7 +35,7 @@ train_namls <- function(train_loader, targets, n_features,
 
   optimizer <- match.arg(optimizer)
 
-  # Initialisiere Parameter
+  # Initialisiere Parameter # !!! Vielleicht besser auf train targets
   params <- init_namls_params(n_features, hidden_neurons, mean(targets),
                                sd(targets), sd(targets))
   arch <- attr(params, "architecture")
