@@ -13,31 +13,29 @@ pm1_scaler <- function(X_train, eps = 1e-8) {
   list(a = a, b = b, eps = eps)
 }
 
-# Transformation mit zuvor gefitteten Parametern
-transform_pm1 <- function(X, scaler, clip = TRUE) {
-  #X <- as.matrix(X)
-  # Spaltenreihenfolge anpassen / sicherstellen
-  # missing_cols <- setdiff(names(scaler$a), colnames(X))
-  # if (length(missing_cols) > 0) {
-  #   # Falls Spalten fehlen, füge konstante Spalten mit dem Train-Min ein (-> wird zu -1)
-  #   for (m in missing_cols) X[, m] <- scaler$a[[m]]
-  #   X <- X[, names(scaler$a), drop = FALSE]
-  # } else {
-  #   X <- X[, names(scaler$a), drop = FALSE]
-  # }
-  a <- scaler$a
-  b <- scaler$b
 
-  den <- pmax(b - a, scaler$eps)
-  #Z <- sweep(sweep(X, 2, a, "-"), 2, den, "/")
-  Z <- 2 * ((X-a)/(b-a)) - 1
+transform_pm1 <- function(X, scaler, clip = FALSE) {
+  rn <- rownames(X)
+  # Spalten in Train-Reihenfolge
+  X <- as.data.frame(X)[, names(scaler$a), drop = FALSE]
 
-  # Konstante Features (b==a) sauber auf 0 setzen
-  const_cols <- which((b - a) < scaler$eps)
-  if (length(const_cols) > 0) Z[, const_cols] <- 0
+  a <- scaler$a; b <- scaler$b
+  den <- b - a
 
-  if (clip) Z <- pmin(1, pmax(-1, Z))
-  Z
+  Z <- 2 * sweep(sweep(as.matrix(X), 2, a, "-"), 2, ifelse(den == 0, 1, den), "/") - 1
+  # konstante Spalten exakt 0
+  if (any(den == 0)) Z[, den == 0] <- 0
+  if (clip) {
+    Z[Z >  1] <-  1
+    Z[Z < -1] <- -1
+  } # nur relevant für val und test split
+
+  dimnames(Z) <- list(rn, names(a))
+  Z <- as.data.frame(Z)
+
+  #attr(out, "normalization_params") <- attr(X, "normalization_params", exact = TRUE)
+
+  return(Z)
 }
 
 # --- Target-Standardisierung --------------------------------------------

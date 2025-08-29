@@ -10,7 +10,7 @@
 #' @param sgima0 Initial guess for sigma (for numerical stability)
 #' @return Liste mit initialisierten Parametern für alle J Subnetzwerke
 #' @export
-init_namlss_params <- function(n_features, hidden_neurons = c(250, 50, 25),
+init_namls_params <- function(n_features, hidden_neurons = c(250, 50, 25),
                                y_mean = 1, y_sd = 0, sigma0 = NULL, seed=42) {
 
   if (!is.null(seed)) set.seed(seed)
