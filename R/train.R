@@ -19,7 +19,7 @@
 #' @export
 train <- function(
     train_loader, targets,
-    val_split = NULL, val_targets = NULL, hidden_neurons=c(50),
+    val_split = NULL, hidden_neurons=c(50),
     epochs = 100, lr = 0.01,
     optimizer = c("sgd", "adam"),
     beta1 = 0.9, beta2 = 0.999, eps = 1e-8,
@@ -28,6 +28,15 @@ train <- function(
     es_patience = 20, es_warmup = 50, es_min_delta = 0,
     restore_best_weights = TRUE
 ) {
+
+  #get val targets if validation split was provided
+  if (!is.null(val_split)) {
+    val_targets <- targets[as.integer(rownames(t(val_split)))] #Transponieren nochmal checken!
+  }
+  else {
+    val_targets <- NULL
+  }
+
   optimizer <- match.arg(optimizer)
 
   dimensions <- getLayerDimensions(train_loader[[1]]$batch, hidden_neurons=hidden_neurons)
