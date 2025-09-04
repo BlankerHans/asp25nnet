@@ -29,13 +29,16 @@
 #' neg_log_lik(y, mu, log_sigma, reduction = "mean")
 #'
 #' @export
-neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw")) {
+neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw"),
+                        eps=1e-6) {
 
   reduction <- match.arg(reduction)
 
-  sigma <- exp(log_sigma)
+  # sigma <- exp(log_sigma)
+  # exp(-2*log_sigma) = exp(log(sigma^-2)) = 1/sigma^2
 
-  loss_i <- 0.5 * log(2*pi) + log_sigma + (y - mu)^2 / (2 * sigma^2)
+  var <- exp(2*s) + eps
+  loss_i <- 0.5*log(2*pi) + 0.5*log(var) + 0.5*(y - mu)^2 / var
 
   if (reduction == "sum") {
     return(sum(loss_i))
@@ -46,19 +49,24 @@ neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw")) {
   }
 }
 
-neg_log_lik_invgamma <- function(y, log_alpha, log_beta, reduction = c("sum","mean","raw")) {
-
+neg_log_lik_invgamma <- function(y, s_alpha, s_beta,
+                                 reduction = c("mean","sum","raw"),
+                                 y_eps = 1e-12,
+                                 alpha_min = 1e-6,
+                                 beta_min  = 1e-6) {
   reduction <- match.arg(reduction)
 
-  alpha <- exp(log_alpha)
-  beta <- exp(log_beta)
+  alpha <- Softplus(s_alpha) + alpha_min
+  beta  <- Softplus(s_beta)  + beta_min
 
-  n <- length(y)
+  y_tilde <- pmax(y, y_eps)
+
 
   # log(L(α, β|y)) = -n(α + 1)log(y) - n*log(Γ(α)) + n*α*log(β) - Σ(β/y_i)
   # Für neg log-lik multiplizieren wir mit -1
+  loss_i <- (alpha + 1) * log(y_tilde) + lgamma(alpha) - alpha * log(beta) + beta / y_tilde
 
-  loss_i <- (alpha + 1) * log(y) + lgamma(alpha) - alpha * log(beta) + beta/y
+
 
   if (reduction == "sum") {
     return(sum(loss_i))

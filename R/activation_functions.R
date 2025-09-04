@@ -44,8 +44,9 @@ ReLU <- function(x) {
 #' Softplus(0)
 #' Softplus(c(-2, 0, 2))
 Softplus <- function(x) {
-  return(log(1 + exp(x)))
+  pmax(x, 0) + log1p(exp(-abs(x)))
 }
+
 
 inv_softplus <- function(y) log(expm1(y)) # numerische stabilität in NAMLSS
 
