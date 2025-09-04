@@ -6,7 +6,7 @@
 
 data(ca_housing)
 
-reduced_df <- ca_housing[, c("MedInc", "HouseAge", "target"), drop = FALSE]
+reduced_df <- ca_housing[, c("MedInc", "Population", "target"), drop = FALSE]
 input_vars <- reduced_df[, setdiff(names(reduced_df), "target"), drop = FALSE]
 
 ca_housing_split <- random_split(input_vars, normalization=FALSE)
@@ -65,7 +65,7 @@ ca_housing_loader <- DataLoader(train_ca_housing, batch_size = 256)
 
 nam_housing <- train_namls(ca_housing_loader, targets_std_full, 2,  c(32, 64, 128, 256), t(val_ca_housing), val_targets_ca_housing,
                            optimizer="adam", epochs=2000, lr=0.001,
-                           dropout_rate=0.1, lr_decay=0.95, lr_patience=50)
+                           dropout_rate=0.1, lr_decay=0.95, lr_patience=10)
 summary.NAMLS(nam_housing,
                data = reduced_df,             # DataFrame mit x-Spalten + Zielspalte
                target_col = "target", # Name der Zielspalte
@@ -73,7 +73,7 @@ summary.NAMLS(nam_housing,
                target_mean = norm_targets$mean,  # für Ziel-Inverse-Transform
                target_sd = norm_targets$sd,      # für Ziel-Inverse-Transform
                show_plot = TRUE,
-               yscale = "robust",       # "auto" | "log" | "robust"
+               yscale = "auto",       # "auto" | "log" | "robust"
                cap_quantile = 0.99,
                drop_first = 1,
                feature_plots = TRUE,  # partielle Effektplots bei >1 Features
@@ -87,3 +87,9 @@ summary.NAMLS(nam_housing,
 # The Insurance Data is provided within the library as well
 
 data(insurance)
+
+test <- one_hot_encode(insurance)
+
+s <- pm1_scaler(insurance)
+
+transform_pm1(insurance, s)

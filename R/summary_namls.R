@@ -114,6 +114,7 @@ summary.NAMLS <- function(object,
       cat("Subnet architecture:     ",
           paste(c(1, obj$architecture$n_h, 2), collapse=" -> "), "\n", sep="")
     }
+    cat("Number of Parameters:    ", obj$n_params, "\n", sep="")
     cat("Optimizer:               ", obj$optimizer, "\n", sep="")
     cat("Loss function:           Negative Log-Likelihood\n")
     cat("Learning rate (start):   ", obj$lr, "\n", sep="")

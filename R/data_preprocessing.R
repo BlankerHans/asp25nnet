@@ -61,3 +61,58 @@ inverse_target <- function(t_std, mean, sd) mean + sd * t_std
 
 
 # to do one-hot encoder
+
+one_hot_encode <- function(data, cat_cols = NULL, ordered_levels = NULL, drop_first = FALSE) {
+  data <- as.data.frame(data)
+
+  # Auto-detect categorical columns
+  if (is.null(cat_cols)) {
+    cat_cols <- names(data)[sapply(data, function(x) is.factor(x) || is.character(x))]
+  }
+
+  if (length(cat_cols) == 0) {
+    return(data)
+  }
+
+  # Separate numerical and categorical
+  num_cols <- setdiff(names(data), cat_cols)
+  data_num <- data[, num_cols, drop = FALSE]
+
+  # One-hot encode each categorical column
+  encoded_list <- list()
+
+  for (col in cat_cols) {
+    # Apply custom ordering if specified
+    if (!is.null(ordered_levels[[col]])) {
+      data[[col]] <- factor(data[[col]], levels = ordered_levels[[col]], ordered = TRUE)
+    } else if (is.character(data[[col]])) {
+      data[[col]] <- as.factor(data[[col]])
+    }
+
+    # Check for missing levels
+    if (any(is.na(data[[col]]) & !is.na(data[[col]]))) {
+      warning(sprintf("Unknown categories in column '%s' will be set to NA", col))
+    }
+
+    # Create dummy variables
+    if (drop_first && nlevels(data[[col]]) > 1) {
+      dummies <- model.matrix(~ data[[col]] - 1)[, -1, drop = FALSE]
+      colnames(dummies) <- paste0(col, "_", levels(data[[col]])[-1])
+    } else {
+      dummies <- model.matrix(~ data[[col]] - 1)
+      colnames(dummies) <- paste0(col, "_", levels(data[[col]]))
+    }
+
+    encoded_list[[col]] <- as.data.frame(dummies)
+  }
+
+  # Combine all
+  if (length(encoded_list) > 0) {
+    data_encoded <- do.call(cbind, encoded_list)
+    result <- cbind(data_num, data_encoded)
+  } else {
+    result <- data_num
+  }
+
+  return(result)
+}
