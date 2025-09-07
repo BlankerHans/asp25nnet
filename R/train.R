@@ -29,8 +29,10 @@ train <- function(
     restore_best_weights = TRUE
 ) {
 
-  #get val targets if validation split was provided
+  #
+  #if validation split was provided: transpose it and get respective targets
   if (!is.null(val_split)) {
+    val_split <- t(val_split)
     val_targets <- targets[as.integer(rownames(t(val_split)))] #Transponieren nochmal checken!
   }
   else {
