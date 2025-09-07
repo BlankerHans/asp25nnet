@@ -45,10 +45,15 @@ random_split <- function(data, split = c(0.6, 0.2, 0.2), normalization = TRUE, s
     stop("The sum of `split` must be exactly 1 (you have ", sum(split), ").")
   }
 
-  # Wieso nicht mehr als input auswählbar?
-  # Shuffle indices
   n <- nrow(data)
+  # Shuffle indices if requested
+  if (shuffle == TRUE) {
   idx_all <- sample(n)
+  }
+  else {
+    idx_all <- seq_len(n)
+  }
+
 
   # Compute sizes
   n_train <- floor(split[1] * n)
