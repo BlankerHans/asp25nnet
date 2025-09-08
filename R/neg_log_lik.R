@@ -37,7 +37,7 @@ neg_log_lik <- function(y, mu, log_sigma, reduction = c("sum","mean","raw"),
   # sigma <- exp(log_sigma)
   # exp(-2*log_sigma) = exp(log(sigma^-2)) = 1/sigma^2
 
-  var <- exp(2*s) + eps
+  var <- exp(2*log_sigma) + eps
   loss_i <- 0.5*log(2*pi) + 0.5*log(var) + 0.5*(y - mu)^2 / var
 
   if (reduction == "sum") {
