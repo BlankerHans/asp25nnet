@@ -10,7 +10,9 @@ val_abdom <- abdom_split$validation
 
 abdom_loader <- DataLoader(train_abdom, batch_size = 256)
 
-model <- train(abdom_loader, abdom_targets,val_abdom, c(50), optimizer="adam", epochs=500, lr=0.01)
+model <- train(abdom_loader, abdom_targets,
+               #val_abdom,
+               hidden_neurons = c(50), optimizer="adam", epochs=500, lr=0.01)
 model <- train(abdom_loader, abdom_targets,hidden_neurons = c(50), optimizer="adam", epochs=500, lr=0.01)
 
 #summary.NN(model, data, "y", yscale="robust", drop_first=10)
