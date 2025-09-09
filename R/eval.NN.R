@@ -25,7 +25,7 @@ eval.NN <- function(object, split_output, verbose = TRUE) {
     reduction = "mean")
 
   # Calculate key figures
-  rmse <- sqrt(mean((test_df_targets - mu)^2))
+  rmse <- sqrt(mean((mu - test_df_targets)^2)) #checken ob das so richtig ist!!
   mae  <- mean(abs(test_df_targets - mu))
 
   #Konsolenoutput

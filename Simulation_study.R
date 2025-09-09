@@ -45,7 +45,7 @@ scenarios <- list(
 # -------------------------------------
 # Parameter
 # -------------------------------------
-n_reps <- 3   # klein zum Testen
+n_reps <- 10   # Anzahl an Durchläufen pro Szenario
 n <- 500      # Stichprobengröße
 
 # -------------------------------------
@@ -65,18 +65,19 @@ for (scn_name in names(scenarios)) {
     set.seed(100 + rep_id)
 
     # Daten generieren
-    data <- gen_fun(n)   # Dataframe mit x, y
+    data <- gen_fun(n)
 
     # Split
     data_split <- random_split(data["x"], normalization = FALSE)
+    train_split <- data_split$train
     val_split <- data_split$validation
     test_split <- data_split$test
     targets <- data$y
 
-    train_loader <- DataLoader(data_split$train)
+    train_loader <- DataLoader(train_split)
 
     # Training
-    model <- train(train_loader,targets , val_split, epochs = 10, optimizer = "adam")
+    model <- train(train_loader,targets , val_split, epochs = 100, optimizer = "adam")
 
     # forward pass auf Test set
     eval <- eval.NN(model, data_split, verbose = FALSE)
@@ -90,15 +91,53 @@ for (scn_name in names(scenarios)) {
     # mittlerer CRPS über Testset
     crps_mean <- mean(crps_values)
 
-    # Ergebnisse sammeln
+    # Ergebnisse für NN
     res <- data.frame(
       scenario = scn_name,
       rep      = rep_id,
+      model    = "DNN",
       nll      = loss,
       rmse     = rmse,
       crps     = crps_mean
     )
     results <- dplyr::bind_rows(results, res) #füge neues res an bisherige results an
+
+    # ----------- lmls ---------------------
+
+    #Targets ziehen und an train_split dranbauen
+    data_targets <- data$y
+    train_targets <- data_targets[as.integer(rownames(train_split))]
+    train_split <- cbind(train_split, train_targets)
+
+
+    # Modell auf trainingsset fitten
+    lmls <- lmls::lmls(train_targets ~ x, ~ x, data = train_split)
+    cat("Check lmls1")
+    # mu und sigma predicten
+    mu_hat_lmls <- predict(lmls, type = "response", predictor = "location")
+    sigma_hat_lmls <- predict(lmls, type = "response", predictor = "scale")
+    cat("Check lmls2")
+
+    # Kennzahlen auf Testset berechnen
+    nll_lmls <- neg_log_lik(test_df_targets, mu_hat_lmls,
+                             log(sigma_hat_lmls), reduction = "mean" )
+    cat("Check lmls3")
+    rmse_lmls <- sqrt(mean((mu_hat_lmls - test_df_targets)^2))
+    cat("Check lmls4")
+    crps_values_lmls <- crps_norm(y = test_df_targets, mean = mu_hat_lmls, sd = sigma_hat_lmls)
+    crps_mean_lmls <- mean(crps_values_lmls)
+
+     cat("Check lmls5")
+
+    res_lmls <- data.frame(
+      scenario = scn_name,
+      rep = rep_id,
+      model = "lmls",
+      nll = nll_lmls,
+      rmse = rmse_lmls,
+      crps = crps_mean_lmls
+    )
+    results <- dplyr::bind_rows(results, res_lmls)
 
     }
 }
@@ -108,11 +147,11 @@ for (scn_name in names(scenarios)) {
 # -------------------------------
 
 summary_results <- results |>
-  dplyr::group_by(scenario) |>
+  dplyr::group_by(scenario, model) |>
   dplyr::summarise(
     mean_nll   = mean(nll),
     mean_rmse  = mean(rmse),
     mean_crps  = mean(crps),
     .groups = "drop"
-  )
+)
 
