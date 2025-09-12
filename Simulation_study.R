@@ -77,7 +77,7 @@ for (scn_name in names(scenarios)) {
     train_loader <- DataLoader(train_split)
 
     # Training
-    model <- train(train_loader,targets , val_split, epochs = 100, optimizer = "adam")
+    model <- train(train_loader,targets , val_split, epochs = 10, optimizer = "adam")
 
     # forward pass auf Test set
     eval <- eval.NN(model, data_split, verbose = FALSE)
@@ -86,9 +86,13 @@ for (scn_name in names(scenarios)) {
     test_df_targets <- eval$test_df_targets
 
     #Berechne CRPS
-    crps_values <- crps_norm(y = test_df_targets, mean = eval$mu, sd = eval$sigma)
-
-    # mittlerer CRPS über Testset
+    if (scn_name %in% c("A", "B")) {
+      crps_values <- crps_norm(y = test_df_targets, location = eval$mu, scale = eval$sigma)
+    } else if (scn_name == "C") {
+      crps_values_lmls <- crps_t(y = test_df_targets, df = 3, location = eval$mu, scale = eval$sigma)
+      cat("CRPS t dnn")
+    }
+      # mittlerer CRPS über Testset
     crps_mean <- mean(crps_values)
 
     # Ergebnisse für NN
@@ -112,22 +116,27 @@ for (scn_name in names(scenarios)) {
 
     # Modell auf trainingsset fitten
     lmls <- lmls::lmls(train_targets ~ x, ~ x, data = train_split)
-    cat("Check lmls1")
+
     # mu und sigma predicten
     mu_hat_lmls <- predict(lmls, type = "response", predictor = "location")
     sigma_hat_lmls <- predict(lmls, type = "response", predictor = "scale")
-    cat("Check lmls2")
+
 
     # Kennzahlen auf Testset berechnen
     nll_lmls <- neg_log_lik(test_df_targets, mu_hat_lmls,
                              log(sigma_hat_lmls), reduction = "mean" )
-    cat("Check lmls3")
-    rmse_lmls <- sqrt(mean((mu_hat_lmls - test_df_targets)^2))
-    cat("Check lmls4")
-    crps_values_lmls <- crps_norm(y = test_df_targets, mean = mu_hat_lmls, sd = sigma_hat_lmls)
-    crps_mean_lmls <- mean(crps_values_lmls)
 
-     cat("Check lmls5")
+    rmse_lmls <- sqrt(mean((mu_hat_lmls - test_df_targets)^2))
+
+
+    if (scn_name %in% c("A", "B")) {
+    crps_values_lmls <- crps_norm(y = test_df_targets, location = mu_hat_lmls, scale = sigma_hat_lmls)
+    crps_mean_lmls <- mean(crps_values_lmls)
+    }
+    else if (scn_name == "C") {
+      crps_values_lmls <- crps_t(y = test_df_targets, df = 3, location = mu_hat_lmls, scale = sigma_hat_lmls)
+    cat("CRPS t lmls")
+    }
 
     res_lmls <- data.frame(
       scenario = scn_name,
@@ -153,5 +162,22 @@ summary_results <- results |>
     mean_rmse  = mean(rmse),
     mean_crps  = mean(crps),
     .groups = "drop"
+) |>
+  dplyr::rename(
+  Scenario    = scenario,
+  Model       = model,
+  `Mean NLL`  = mean_nll,
+  `Mean RMSE` = mean_rmse,
+  `Mean CRPS` = mean_crps
 )
+
+# Export für LaTeX
+knitr::kable(
+  summary_results,
+  format   = "latex",
+  booktabs = TRUE,
+  digits   = 3,
+  caption  = "Simulation results across scenarios and models."
+)
+
 
