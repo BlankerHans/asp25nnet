@@ -4,7 +4,12 @@
 \alias{random_split}
 \title{Split dataset into training, validation and test sets with optional normalization}
 \usage{
-random_split(data, split = c(0.6, 0.2, 0.2), normalization = TRUE)
+random_split(
+  data,
+  split = c(0.6, 0.2, 0.2),
+  normalization = TRUE,
+  shuffle = TRUE
+)
 }
 \arguments{
 \item{data}{A data frame or matrix containing the dataset to split. Just use the
@@ -15,6 +20,8 @@ validation, and test sets. Must sum to 1. Default is c(0.6, 0.2, 0.2).}
 
 \item{normalization}{Logical indicating whether to normalize the subsets based on
 mean and standard deviation of the training data. Default is TRUE.}
+
+\item{shuffle}{logical, wheter to shuffle the data before splitting (default is TRUE)description}
 }
 \value{
 A list with the following components:

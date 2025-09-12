@@ -8,6 +8,9 @@
   object,
   data,
   target_col,
+  pm1_scaler = NULL,
+  target_mean = NULL,
+  target_sd = NULL,
   show_plot = TRUE,
   yscale = c("auto", "log", "robust"),
   cap_quantile = 0.99,
@@ -19,27 +22,39 @@
 }
 \arguments{
 \item{object}{Trained NAMLS model object containing parameters, optimizer, learning rate,
-epochs, losses, and optional normalization info.}
+epochs, losses, and training information.}
 
 \item{data}{Data frame used for model evaluation, including predictors and target.}
 
 \item{target_col}{Character string with the name of the target variable.}
+
+\item{pm1_scaler}{List containing feature scaling parameters from pm1_scaler() function,
+with elements 'a' (min values), 'b' (max values), and 'eps'. If NULL, no feature
+scaling is applied.}
+
+\item{target_mean}{Numeric; mean of target variable from training set used for
+normalization. If NULL, no target denormalization is performed.}
+
+\item{target_sd}{Numeric; standard deviation of target variable from training set
+used for normalization. If NULL, no target denormalization is performed.}
 
 \item{show_plot}{Logical; if TRUE, plots of losses and predictions are shown. Default is TRUE.}
 
 \item{yscale}{Character; determines y-axis scaling for loss plots:
 \code{"auto"} (linear), \code{"log"} (logarithmic), \code{"robust"} (capped at quantile).}
 
-\item{cap_quantile}{Numeric (0–1); quantile for robust loss capping. Default is 0.99.}
+\item{cap_quantile}{Numeric (0-1); quantile for robust loss capping. Default is 0.99.}
 
 \item{drop_first}{Integer; number of initial epochs to exclude from loss plots. Default is 0.}
 
 \item{feature_plots}{Logical; if TRUE and more than one feature is present, partial effect
 plots are generated. Default is TRUE.}
 
-\item{max_features}{Integer; maximum number of features to display in partial effect plots. Default is 6.}
+\item{max_features}{Integer; maximum number of features to display in partial effect plots.
+Default is 6.}
 
-\item{ci_z}{Numeric; z-value used for confidence interval calculation. Default is 1.96 (≈ 95\% CI).}
+\item{ci_z}{Numeric; z-value used for confidence interval calculation.
+Default is 1.96 (approximately 95\% CI).}
 }
 \value{
 Invisibly returns the input \code{object} after printing a summary and
@@ -53,14 +68,21 @@ Depending on the number of input features, it produces loss curves,
 }
 \examples{
 \dontrun{
-# Assuming `namls_model` is a trained NAMLS model object
+# Train model
+model <- train_namls(...)
+
+# Get preprocessing parameters from training
+pm1 <- pm1_scaler(train_data)
+norm_targets <- normalize_targets(train_targets)
+
+# Summary with preprocessing info
 summary.NAMLS(
-  object = namls_model,
-  data = mydata,
+  object = model,
+  data = test_data,
   target_col = "y",
-  show_plot = TRUE,
-  yscale = "robust",
-  feature_plots = TRUE
+  pm1_scaler = pm1,
+  target_mean = norm_targets$mean,
+  target_sd = norm_targets$sd
 )
 }
 

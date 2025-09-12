@@ -10,6 +10,7 @@
 #' validation, and test sets. Must sum to 1. Default is c(0.6, 0.2, 0.2).
 #' @param normalization Logical indicating whether to normalize the subsets based on
 #'  mean and standard deviation of the training data. Default is TRUE.
+#' @param shuffle logical, wheter to shuffle the data before splitting (default is TRUE)description
 #'
 #' @return A list with the following components:
 #' \describe{

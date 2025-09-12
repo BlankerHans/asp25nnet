@@ -1,4 +1,33 @@
-# Eval function
+#' Evaluate a Trained Neural Network Model
+#'
+#' Evaluates a trained neural network on a given test set. Performs a forward
+#' pass, calculates prediction uncertainty, loss, and key performance metrics.
+#' Optionally prints evaluation results to the console.
+#'
+#' @param object Trained model object containing learned parameters (`params`)
+#'   and target values (`targets`).
+#' @param split_output List containing train/test split data. The element
+#'   `split_output$test` must contain the test set.
+#' @param verbose Logical; if `TRUE` (default), prints evaluation metrics to
+#'   the console.
+#'
+#' @return A list with the following elements:
+#' \item{fwd}{Forward pass results on the test set.}
+#' \item{loss}{Negative log-likelihood loss on the test set.}
+#' \item{mu}{Predicted means for the test samples.}
+#' \item{sigma}{Predicted standard deviations for the test samples.}
+#' \item{cover}{Proportion of true values within the 95\% prediction interval.}
+#' \item{rmse}{Root mean squared error on the test set.}
+#' \item{mae}{Mean absolute error on the test set.}
+#' \item{test_df_targets}{True target values for the test set.}
+#'
+#' @examples
+#' \dontrun{
+#' evaluation <- eval.NN(model, split_output, verbose = TRUE)
+#' }
+#'
+#' @export
+
 eval.NN <- function(object, split_output, verbose = TRUE) {
 
   params <- object$params

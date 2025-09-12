@@ -4,7 +4,7 @@
 \alias{neg_log_lik}
 \title{Negative Log-Likelihood for a Normal Distribution}
 \usage{
-neg_log_lik(y, mu, log_sigma, reduction = c("sum", "mean", "raw"))
+neg_log_lik(y, mu, log_sigma, reduction = c("sum", "mean", "raw"), eps = 1e-06)
 }
 \arguments{
 \item{y}{Numeric vector of observed values.}

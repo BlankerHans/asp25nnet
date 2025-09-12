@@ -2,51 +2,93 @@
 % Please edit documentation in R/train.R
 \name{train}
 \alias{train}
-\title{Train a Multi-Layer Neural Network (SGD oder Adam, optional mit Validation)}
+\title{Train a Neural Network Model}
 \usage{
 train(
   train_loader,
   targets,
   val_split = NULL,
-  val_targets = NULL,
   hidden_neurons = c(50),
   epochs = 100,
   lr = 0.01,
   optimizer = c("sgd", "adam"),
   beta1 = 0.9,
   beta2 = 0.999,
-  eps = 1e-08
+  eps = 1e-08,
+  verbose = TRUE,
+  early_stopping = TRUE,
+  es_patience = 20,
+  es_warmup = 50,
+  es_min_delta = 0,
+  restore_best_weights = TRUE
 )
 }
 \arguments{
-\item{train_loader}{Liste von Batches (jeweils $batch und $idx).}
+\item{train_loader}{List of training batches, each containing a matrix \code{batch}
+and corresponding indices \code{idx}.}
 
-\item{targets}{Zielwerte für alle Beobachtungen.}
+\item{targets}{Numeric vector of target values for the full dataset.}
 
-\item{val_split}{Optional: Matrix für Validierungs-Inputs.}
+\item{val_split}{Optional validation set matrix (default: \code{NULL}).}
 
-\item{val_targets}{Optional: Vektor für Validierungs-Ziele.}
+\item{hidden_neurons}{Integer vector; number of hidden neurons per layer
+(default: \code{c(50)}).}
 
-\item{hidden_neurons}{Vector of neurons per hidden layer, e.g., c(50, 30, 20) chronologically ordered flowing from input to output, i.e. left to right}
+\item{epochs}{Number of training epochs (default: \code{100}).}
 
-\item{epochs}{Anzahl Epochen (Default 100).}
+\item{lr}{Learning rate (default: \code{0.01}).}
 
-\item{lr}{Lernrate (Default 0.01).}
+\item{optimizer}{Optimization algorithm, either \code{"sgd"} or \code{"adam"} (default: \code{"sgd"}).}
 
-\item{optimizer}{Optimizer, entweder "sgd" oder "adam" (Default "sgd").}
+\item{beta1}{Exponential decay rate for the first moment estimate (Adam only, default: \code{0.9}).}
 
-\item{beta1}{Adam β1 (nur wenn optimizer = "adam", Default 0.9).}
+\item{beta2}{Exponential decay rate for the second moment estimate (Adam only, default: \code{0.999}).}
 
-\item{beta2}{Adam β2 (nur wenn optimizer = "adam", Default 0.999).}
+\item{eps}{Small constant for numerical stability in Adam optimizer (default: \code{1e-8}).}
 
-\item{eps}{Adam ε (nur wenn optimizer = "adam", Default 1e-8).}
+\item{verbose}{Logical; if \code{TRUE} (default), prints training progress and
+summary information.}
+
+\item{early_stopping}{Logical; if \code{TRUE} (default), enables early stopping
+based on validation loss.}
+
+\item{es_patience}{Number of epochs with no improvement before stopping (default: \code{20}).}
+
+\item{es_warmup}{Minimum number of epochs before early stopping can be triggered (default: \code{50}).}
+
+\item{es_min_delta}{Minimum required improvement in validation loss to reset patience (default: \code{0}).}
+
+\item{restore_best_weights}{Logical; if \code{TRUE} (default), restores model
+weights from the best validation epoch.}
 }
 \value{
-Liste mit
-\item{params}{Gelernte Parameter}
-\item{train_loss}{Vektor der Trainingsverluste pro Epoche}
-\item{val_loss}{Optional: Vektor der Validierungsverluste pro Epoche}
+A list of class \code{"NN"} containing:
+\item{params}{Trained model parameters.}
+\item{train_loss}{Vector of training loss values across epochs.}
+\item{val_loss}{Vector of validation loss values (if validation split provided).}
+\item{architecture}{Model architecture details.}
+\item{epochs}{Number of training epochs performed.}
+\item{lr}{Learning rate used in training.}
+\item{optimizer}{Optimizer used (\code{"sgd"} or \code{"adam"}).}
+\item{normalization}{Normalization parameters from the training data.}
+\item{targets}{Original target values.}
 }
 \description{
-Train a Multi-Layer Neural Network (SGD oder Adam, optional mit Validation)
+Trains a feedforward neural network using stochastic gradient descent (SGD)
+or Adam optimization. Supports validation splits, early stopping, and
+restoring best weights. Returns the trained model parameters and training
+history.
+}
+\examples{
+\dontrun{
+# Example: training with validation split
+model <- train(
+  train_loader, targets,
+  val_split = val_data,
+  hidden_neurons = c(64, 32),
+  epochs = 200, lr = 0.001,
+  optimizer = "adam"
+)
+}
+
 }

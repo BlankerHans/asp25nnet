@@ -1,22 +1,57 @@
-#' Train a Multi-Layer Neural Network (SGD oder Adam, optional mit Validation)
+#' Train a Neural Network Model
 #'
-#' @param train_loader  Liste von Batches (jeweils $batch und $idx).
-#' @param targets       Zielwerte für alle Beobachtungen.
-#' @param hidden_neurons Vector of neurons per hidden layer, e.g., c(50, 30, 20) chronologically ordered flowing from input to output, i.e. left to right
-#' @param epochs        Anzahl Epochen (Default 100).
-#' @param lr            Lernrate (Default 0.01).
-#' @param optimizer     Optimizer, entweder "sgd" oder "adam" (Default "sgd").
-#' @param beta1         Adam β1 (nur wenn optimizer = "adam", Default 0.9).
-#' @param beta2         Adam β2 (nur wenn optimizer = "adam", Default 0.999).
-#' @param eps           Adam ε (nur wenn optimizer = "adam", Default 1e-8).
-#' @param val_split  Optional: Matrix für Validierungs-Inputs.
-#' @param val_targets  Optional: Vektor für Validierungs-Ziele.
+#' Trains a feedforward neural network using stochastic gradient descent (SGD)
+#' or Adam optimization. Supports validation splits, early stopping, and
+#' restoring best weights. Returns the trained model parameters and training
+#' history.
 #'
-#' @return Liste mit
-#' \item{params}{Gelernte Parameter}
-#' \item{train_loss}{Vektor der Trainingsverluste pro Epoche}
-#' \item{val_loss}{Optional: Vektor der Validierungsverluste pro Epoche}
+#' @param train_loader List of training batches, each containing a matrix `batch`
+#'   and corresponding indices `idx`.
+#' @param targets Numeric vector of target values for the full dataset.
+#' @param val_split Optional validation set matrix (default: `NULL`).
+#' @param hidden_neurons Integer vector; number of hidden neurons per layer
+#'   (default: `c(50)`).
+#' @param epochs Number of training epochs (default: `100`).
+#' @param lr Learning rate (default: `0.01`).
+#' @param optimizer Optimization algorithm, either `"sgd"` or `"adam"` (default: `"sgd"`).
+#' @param beta1 Exponential decay rate for the first moment estimate (Adam only, default: `0.9`).
+#' @param beta2 Exponential decay rate for the second moment estimate (Adam only, default: `0.999`).
+#' @param eps Small constant for numerical stability in Adam optimizer (default: `1e-8`).
+#' @param verbose Logical; if `TRUE` (default), prints training progress and
+#'   summary information.
+#' @param early_stopping Logical; if `TRUE` (default), enables early stopping
+#'   based on validation loss.
+#' @param es_patience Number of epochs with no improvement before stopping (default: `20`).
+#' @param es_warmup Minimum number of epochs before early stopping can be triggered (default: `50`).
+#' @param es_min_delta Minimum required improvement in validation loss to reset patience (default: `0`).
+#' @param restore_best_weights Logical; if `TRUE` (default), restores model
+#'   weights from the best validation epoch.
+#'
+#' @return A list of class `"NN"` containing:
+#' \item{params}{Trained model parameters.}
+#' \item{train_loss}{Vector of training loss values across epochs.}
+#' \item{val_loss}{Vector of validation loss values (if validation split provided).}
+#' \item{architecture}{Model architecture details.}
+#' \item{epochs}{Number of training epochs performed.}
+#' \item{lr}{Learning rate used in training.}
+#' \item{optimizer}{Optimizer used (`"sgd"` or `"adam"`).}
+#' \item{normalization}{Normalization parameters from the training data.}
+#' \item{targets}{Original target values.}
+#'
+#' @examples
+#' \dontrun{
+#' # Example: training with validation split
+#' model <- train(
+#'   train_loader, targets,
+#'   val_split = val_data,
+#'   hidden_neurons = c(64, 32),
+#'   epochs = 200, lr = 0.001,
+#'   optimizer = "adam"
+#' )
+#' }
+#'
 #' @export
+
 train <- function(
     train_loader, targets,
     val_split = NULL, hidden_neurons=c(50),

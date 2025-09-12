@@ -4,14 +4,14 @@
 \alias{DataLoader}
 \title{DataLoader: Load data in batches with optional shuffling}
 \usage{
-DataLoader(data, batch_size = 32, shuffle = TRUE)
+DataLoader(data, batch_size = 32, shuffle = FALSE)
 }
 \arguments{
 \item{data}{A matrix to be processed in batches. (Use the output of the train_val_tes func)}
 
 \item{batch_size}{Integer specifying the size of each batch (default is 32).}
 
-\item{shuffle}{Logical, whether to shuffle the data before batching (default is TRUE).}
+\item{shuffle}{Logical, whether to shuffle the data before batching (default is FALSE).}
 }
 \value{
 A list of lists, each containing:
