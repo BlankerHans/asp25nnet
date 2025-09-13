@@ -1,9 +1,15 @@
 Package: asp25nnet
-Title: What the Package Does (One Line, Title Case)
+Title: Feed-forward Neural Network for Location-Scale Estimation
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    c(
+    person("Henning", "Dinkela", , "h.dinkela@stud.uni-goettingen.de", role = c("aut", "cre"))
+    person("Florian", "Penzkofer", , "florian.penzkofer@stud.uni-goettingen.de", role = "aut"
+    )
+Description: Provides tools for training and evaluating neural networks tailored 
+to the estimation of the mean and the standard deviation of a target variable. Includes a neural network with hidden layers 
+adjustable in size and number, a neural additive model based on Thielmann et al. (2024)
+as well as functions for data preperation and model evaluation.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

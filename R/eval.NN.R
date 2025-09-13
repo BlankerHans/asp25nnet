@@ -75,12 +75,3 @@ eval.NN <- function(object, split_output, verbose = TRUE) {
     mae = mae,
     test_df_targets = test_df_targets
   ))
-  # True vs Predicted Plot
-#  plot(
-#    test_df_targets, as.numeric(fwd$mu),
-#    xlab = "True", ylab = "Predicted (mu)",
-#    main = "True vs Predicted",
-#    pch = 19, col = rgb(0, 0, 1, 0.5)
-#  )
-#  abline(0, 1, col = "red", lwd = 2, lty = 2)  # perfekte Vorhersage
-}

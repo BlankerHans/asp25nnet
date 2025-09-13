@@ -177,7 +177,6 @@ summary.NN <- function(object,
 
     #Prediction plot: 2 Inputs
     else if (nr_inputs == 2) {
-      library(rgl)
 
       x1 <- data[[x_col[1]]]
       x2 <- data[[x_col[2]]]
@@ -205,20 +204,20 @@ summary.NN <- function(object,
       mu_grid    <- matrix(as.numeric(fwd_grid$mu), nrow = grid_size, byrow = FALSE)
 
       # Plot
-      open3d()
-      points3d(x1, x2, y, col = "black", size = 5)  # Datenpunkte
+      rgl::open3d()
+      rgl::points3d(x1, x2, y, col = "black", size = 5)  # Datenpunkte
 
       # Fläche: mu
-      surface3d(x1_seq, x2_seq, mu_grid, color = "red", alpha = 0.6, front = "lines")
+      rgl::surface3d(x1_seq, x2_seq, mu_grid, color = "red", alpha = 0.6, front = "lines")
 
       # Achsen + Titel
-      axes3d()
-      title3d(xlab = x_col[1],
+      rgl::axes3d()
+      rgl::title3d(xlab = x_col[1],
               ylab = x_col[2],
               zlab = target_col,
               main = "3D plot with estimated mu ")
 
-      cat("\nTo access the plot, use the command rglwidget()")
+      cat("\nTo access the plot, use the command rgl::rglwidget()")
     }
     else {
       message("Plotting not possible for > 2 input features")

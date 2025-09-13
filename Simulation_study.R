@@ -43,16 +43,17 @@ scenarios <- list(
 )
 
 # -------------------------------------
-# Parameter
+# Vorbereitung
 # -------------------------------------
-n_reps <- 10   # Anzahl an Durchläufen pro Szenario
+n_reps <- 50  # Anzahl an Durchläufen pro Szenario
 n <- 500      # Stichprobengröße
+set.seed(42)
 
+rng_states <- list()
+results <- data.frame()
 # -------------------------------------
 # Hauptschleife
 # -------------------------------------
-
-results <- data.frame()
 
 for (scn_name in names(scenarios)) {
 
@@ -62,7 +63,10 @@ for (scn_name in names(scenarios)) {
   for (rep_id in 1:n_reps) {
 
     cat("  Replikation:", rep_id, "\n")
-    set.seed(100 + rep_id)
+
+    # RNG-State speichern
+    rng_states[[paste0(scn_name, "_", rep_id)]] <- .Random.seed
+
 
     # Daten generieren
     data <- gen_fun(n)
@@ -77,7 +81,7 @@ for (scn_name in names(scenarios)) {
     train_loader <- DataLoader(train_split)
 
     # Training
-    model <- train(train_loader,targets , val_split, epochs = 10, optimizer = "adam")
+    model <- train(train_loader,targets , val_split, epochs = 1, optimizer = "adam")
 
     # forward pass auf Test set
     eval <- eval.NN(model, data_split, verbose = FALSE)
@@ -87,10 +91,9 @@ for (scn_name in names(scenarios)) {
 
     #Berechne CRPS
     if (scn_name %in% c("A", "B")) {
-      crps_values <- crps_norm(y = test_df_targets, location = eval$mu, scale = eval$sigma)
+      crps_values <- scoringRules::crps_norm(y = test_df_targets, location = eval$mu, scale = eval$sigma)
     } else if (scn_name == "C") {
-      crps_values_lmls <- crps_t(y = test_df_targets, df = 3, location = eval$mu, scale = eval$sigma)
-      cat("CRPS t dnn")
+      crps_values_lmls <- scoringRules::crps_t(y = test_df_targets, df = 3, location = eval$mu, scale = eval$sigma)
     }
       # mittlerer CRPS über Testset
     crps_mean <- mean(crps_values)
@@ -130,12 +133,11 @@ for (scn_name in names(scenarios)) {
 
 
     if (scn_name %in% c("A", "B")) {
-    crps_values_lmls <- crps_norm(y = test_df_targets, location = mu_hat_lmls, scale = sigma_hat_lmls)
+    crps_values_lmls <- scoringRules::crps_norm(y = test_df_targets, location = mu_hat_lmls, scale = sigma_hat_lmls)
     crps_mean_lmls <- mean(crps_values_lmls)
     }
     else if (scn_name == "C") {
-      crps_values_lmls <- crps_t(y = test_df_targets, df = 3, location = mu_hat_lmls, scale = sigma_hat_lmls)
-    cat("CRPS t lmls")
+      crps_values_lmls <- scoringRules::crps_t(y = test_df_targets, df = 3, location = mu_hat_lmls, scale = sigma_hat_lmls)
     }
 
     res_lmls <- data.frame(
@@ -148,8 +150,11 @@ for (scn_name in names(scenarios)) {
     )
     results <- dplyr::bind_rows(results, res_lmls)
 
-    }
+  }
+  # RNG-State nach der letzten Replikation speichern
+#  rng_states[[paste0(scn_name, "_", n_reps + 1)]] <- .Random.seed
 }
+
 
 # -------------------------------
 # Ergebnisse
