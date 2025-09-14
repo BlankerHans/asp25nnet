@@ -41,7 +41,7 @@
 #' @examples
 #' \dontrun{
 #' # Example: training with validation split
-#' model <- train(
+#' model <- train.DNN(
 #'   train_loader, targets,
 #'   val_split = val_data,
 #'   hidden_neurons = c(64, 32),
@@ -52,7 +52,7 @@
 #'
 #' @export
 
-train <- function(
+train.DNN <- function(
     train_loader, targets,
     val_split = NULL, hidden_neurons=c(50),
     epochs = 100, lr = 0.01,

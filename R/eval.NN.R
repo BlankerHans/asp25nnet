@@ -25,12 +25,12 @@
 #'
 #' @examples
 #' \dontrun {
-#' evaluation <- eval.NN(model, split_output, verbose = TRUE)
+#' evaluation <- eval.DNN(model, split_output, verbose = TRUE)
 #'}
 #'
 #' @export
 
-eval.NN <- function(object, split_output, verbose = TRUE) {
+eval.DNN <- function(object, split_output, verbose = TRUE) {
 
   params <- object$params
 

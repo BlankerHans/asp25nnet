@@ -20,7 +20,7 @@
 #' @examples
 #' \dontrun{
 #' # Assuming `nn_model` is a trained neural network object
-#' summary.NN(
+#' summary.DNN(
 #'   object = nn_model,
 #'   data = mydata,
 #'   target_col = "y",
@@ -32,7 +32,7 @@
 #' @export
 
 
-summary.NN <- function(object,
+summary.DNN <- function(object,
                        data,
                        target_col,
                        show_plot = TRUE,
