@@ -15,11 +15,9 @@
 #'   depending on the \code{reduction} parameter.
 #'
 #' @details
-#' For each observation \( y_i \), the function calculates the term:
-#' \[
-#' \log(\sigma) + \frac{(y_i - \mu_i)^2}{2 \sigma^2}
-#' \]
-#' where \(\sigma = \exp(\text{log_sigma})\).
+#' For each observation y_i, the function calculates the term:
+#' \deqn{\log(\sigma) + \frac{(y_i - \mu_i)^2}{2 \sigma^2}}
+#' where \eqn{\sigma = \exp(\text{log_sigma})}.
 #' The result is then aggregated based on the \code{reduction} argument.
 #'
 #' @examples

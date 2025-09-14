@@ -20,9 +20,8 @@
 #'
 #' @examples
 #' df <- data.frame(x = rnorm(100), y = rnorm(100))
-#' res <- train_val_test(df, split = c(0.6, 0.2, 0.2))
+#' res <- random_split(df, split = c(0.6, 0.2, 0.2))
 #' train_loader <- DataLoader(res$train, batch_size = 50, shuffle = FALSE)
-#' str(batches[[1]])
 #'
 #' @export
 DataLoader <- function(data, batch_size=32, shuffle=FALSE) {
