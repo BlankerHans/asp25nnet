@@ -12,6 +12,7 @@
 #'   the console.
 #'
 #' @return A list with the following elements:
+#' \describe{
 #' \item{fwd}{Forward pass results on the test set.}
 #' \item{loss}{Negative log-likelihood loss on the test set.}
 #' \item{mu}{Predicted means for the test samples.}
@@ -20,11 +21,12 @@
 #' \item{rmse}{Root mean squared error on the test set.}
 #' \item{mae}{Mean absolute error on the test set.}
 #' \item{test_df_targets}{True target values for the test set.}
+#' }
 #'
 #' @examples
-#' \dontrun{
+#' \dontrun {
 #' evaluation <- eval.NN(model, split_output, verbose = TRUE)
-#' }
+#'}
 #'
 #' @export
 
@@ -75,3 +77,4 @@ eval.NN <- function(object, split_output, verbose = TRUE) {
     mae = mae,
     test_df_targets = test_df_targets
   ))
+}

@@ -18,6 +18,7 @@ the console.}
 }
 \value{
 A list with the following elements:
+\describe{
 \item{fwd}{Forward pass results on the test set.}
 \item{loss}{Negative log-likelihood loss on the test set.}
 \item{mu}{Predicted means for the test samples.}
@@ -27,13 +28,14 @@ A list with the following elements:
 \item{mae}{Mean absolute error on the test set.}
 \item{test_df_targets}{True target values for the test set.}
 }
+}
 \description{
 Evaluates a trained neural network on a given test set. Performs a forward
 pass, calculates prediction uncertainty, loss, and key performance metrics.
 Optionally prints evaluation results to the console.
 }
 \examples{
-\dontrun{
+\dontrun {
 evaluation <- eval.NN(model, split_output, verbose = TRUE)
 }
 
