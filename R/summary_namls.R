@@ -55,6 +55,7 @@
 summary.NAMLS <- function(object,
                           data,
                           target_col,
+                          dummy_cols = NULL,
                           pm1_scaler = NULL,
                           target_mean = NULL,
                           target_sd = NULL,
@@ -173,7 +174,12 @@ summary.NAMLS <- function(object,
 
   # Apply feature preprocessing if pm1_scaler is provided
   if (!is.null(pm1_scaler)) {
-    X_used <- transform_pm1(X_raw, pm1_scaler, clip = TRUE)
+
+    if (!is.null(dummy_cols)){
+      X_used <- dummy_pm1_wrapper(X_raw, pm1_scaler, dummy_cols)
+    } else {
+      X_used <- transform_pm1(X_raw, pm1_scaler, clip = TRUE)
+    }
   } else {
     # No feature preprocessing
     X_used <- X_raw
@@ -276,11 +282,12 @@ summary.NAMLS <- function(object,
         feat_out[, i] <- fwd_j$output
       }
 
-      # Add global biases
-      mu_j <- feat_out[1, ] + object$params$beta_mu
-      sigma_j <- Softplus_(feat_out[2, ] + object$params$beta_sigma)
+      # Add global biases ?
+      mu_j <- feat_out[1, ] #+ object$params$beta_mu
+      sigma_j <- Softplus_(feat_out[2, ]) # + object$params$beta_sigma
 
       # Denormalize if target parameters provided
+      # vielleicht doch nicht nötig für partial plots?
       if (!is.null(target_mean) && !is.null(target_sd)) {
         mu_j <- target_mean + target_sd * mu_j
         sigma_j <- target_sd * sigma_j

@@ -116,3 +116,20 @@ one_hot_encode <- function(data, cat_cols = NULL, ordered_levels = NULL, drop_fi
 
   return(result)
 }
+
+
+# 1) Dummy-Spalten erkennen (0/1 numerisch)
+detect_dummy_cols <- function(df) {
+  names(df)[sapply(df, function(x)
+    is.numeric(x) && all(x %in% c(0, 1) | is.na(x)))]
+}
+
+# 2) Wrapper: skaliert wie bisher, überschreibt danach Dummies mit Original
+dummy_pm1_wrapper <- function(X, scaler, dummy_cols, clip = FALSE) {
+  X <- as.data.frame(X)
+  Z <- transform_pm1(X, scaler, clip = clip)
+  keep <- intersect(dummy_cols, names(Z))
+  if (length(keep)) Z[keep] <- X[keep]
+  Z
+}
+
