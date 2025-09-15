@@ -41,7 +41,7 @@
 #' norm_targets <- normalize_targets(train_targets)
 #'
 #' # Summary with preprocessing info
-#' summary.NAMLS(
+#' summary_NAMLS(
 #'   object = model,
 #'   data = test_data,
 #'   target_col = "y",
@@ -52,7 +52,7 @@
 #' }
 #'
 #' @export
-summary.NAMLS <- function(object,
+summary_NAMLS <- function(object,
                           data,
                           target_col,
                           dummy_cols = NULL,
@@ -236,14 +236,14 @@ summary.NAMLS <- function(object,
     graphics::par(mfrow = c(1,1))
     graphics::plot(x_s, y_s, pch = 16, cex = 0.6,
                    xlab = x_cols[1], ylab = target_col,
-                   main = sprintf("NAMLS Fit (μ ± %.1fσ)", ci_z))
+                   main = sprintf("NAMLS Fit (mu +/- %.1f sigma)", ci_z))
     graphics::lines(x_s, mu_s, col = "red", lwd = 2)
     graphics::polygon(c(x_s, rev(x_s)), c(upper, rev(lower)),
                       col = grDevices::rgb(0.2, 0.2, 1, alpha = 0.2), border = NA)
 
     # Add legend
     legend("topleft",
-           legend = c("Data", "Mean (μ)", sprintf("%.0f%% CI", 100*(2*pnorm(ci_z)-1))),
+           legend = c("Data", "Mean (mu)", sprintf("%.0f%% CI", 100*(2*pnorm(ci_z)-1))),
            col = c("black", "red", grDevices::rgb(0.2, 0.2, 1, alpha = 0.4)),
            pch = c(16, NA, NA),
            lty = c(NA, 1, NA),
@@ -287,7 +287,7 @@ summary.NAMLS <- function(object,
       sigma_j <- Softplus_(feat_out[2, ]) # + object$params$beta_sigma
 
       # Denormalize if target parameters provided
-      # vielleicht doch nicht nötig für partial plots?
+      # vielleicht doch nicht noetig fuer partial plots?
       if (!is.null(target_mean) && !is.null(target_sd)) {
         mu_j <- target_mean + target_sd * mu_j
         sigma_j <- target_sd * sigma_j

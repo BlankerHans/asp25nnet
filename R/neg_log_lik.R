@@ -10,6 +10,7 @@
 #'   \code{"sum"} (default) returns the sum of individual losses,
 #'   \code{"mean"} returns their mean,
 #'   \code{"raw"} returns the vector of individual loss values.
+#' @param eps Value for numeric stability (default = 1e-6)
 #'
 #' @return A numeric scalar or vector of negative log-likelihood values,
 #'   depending on the \code{reduction} parameter.

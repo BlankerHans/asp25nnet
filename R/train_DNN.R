@@ -201,12 +201,12 @@ train.DNN <- function(
       }
 
       message(sprintf(
-        "Epoch %3d/%d – Train loss: %.6f | Validation loss: %.6f",
+        "Epoch %3d/%d - Train loss: %.6f | Validation loss: %.6f",
         e, epochs, history_train[e], history_val[e]
       ))
     } else {
       message(sprintf(
-        "Epoch %3d/%d – Loss: %.6f",
+        "Epoch %3d/%d - Loss: %.6f",
         e, epochs, history_train[e]
       ))
     }

@@ -1,14 +1,15 @@
-#' Initialize NAMLSS Parameters
+#' Initialize NAMLS Parameters
 #'
-#' Initialisiert NAMLSS mit J Subnetzwerken (eins pro Feature),
-#' jedes mit 2-dimensionalem Output (für mu und sigma)
+#' Initializes NAMLS with J sub networks (one per feature),
+#' each with a two-dimensional output (mu and sigma)
 #'
-#' @param n_features Anzahl der Input-Features (J)
-#' @param hidden_neurons Vector der Hidden Layer Größen, z.B. c(250, 50, 25)
+#' @param n_features number of input features (J)
+#' @param hidden_neurons hidden layer architecture, z.B. c(250, 50, 25)
 #' @param y_mean mean of target (for numerical stability)
 #' @param y_sd sd of target (for numerical stability)
-#' @param sgima0 Initial guess for sigma (for numerical stability)
-#' @return Liste mit initialisierten Parametern für alle J Subnetzwerke
+#' @param sigma0 Initial guess for sigma (for numerical stability)
+#' @param seed seed setting ( default is 42)
+#' @return A list containing the initialized parameters for all J sub networks
 #' @export
 init_namls_params <- function(n_features, hidden_neurons = c(250, 50, 25),
                                y_mean = 1, y_sd = 0, sigma0 = NULL, seed=42) {
