@@ -70,6 +70,9 @@ ca_housing_loader <- DataLoader(train_ca_housing, batch_size = 256)
 nam_housing <- train_namls(ca_housing_loader, targets_std_full, length(input_vars),  c(32, 64, 128, 256), t(val_ca_housing), val_targets_ca_housing,
                              optimizer="adam", epochs=2000, lr=1e-03,
                              dropout_rate=0.1, lr_decay=0.95, lr_patience=10, es_patience=100)
+
+
+
 summary.NAMLS(nam_housing,
                data = ca_housing,             # DataFrame mit x-Spalten + Zielspalte
                target_col = "target", # Name der Zielspalte
@@ -83,6 +86,10 @@ summary.NAMLS(nam_housing,
                feature_plots = TRUE,  # partielle Effektplots bei >1 Features
                max_features = n_inputs,
                ci_z = 1.96)
+
+dnn_housing <- train.DNN(ca_housing_loader, targets_std_full, val_ca_housing, c(32, 64, 128, 256),
+                         optimizer="adam", epochs=2000, lr=1e-03, es_patience=100)
+
 
 
 # saveRDS(nam_housing, file = "nam_housing.rds")
@@ -170,4 +177,3 @@ summary.NAMLS(nam_insurance,
               feature_plots = TRUE,  # partielle Effektplots bei >1 Features
               max_features = n_inputs,
               ci_z = 1.96)
-#

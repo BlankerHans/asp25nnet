@@ -1,17 +1,14 @@
 Package: asp25nnet
-Title: Feed-forward Neural Network for Location-Scale Estimation
+Title: Deep Learning Approaches to Location–Scale Regression
 Version: 0.0.0.9000
 Authors@R: 
     c(
     person("Henning", "Dinkela", email = "h.dinkela@stud.uni-goettingen.de", role = c("aut", "cre")),
     person("Florian", "Penzkofer", email = "florian.penzkofer@stud.uni-goettingen.de", role = "aut")
     )
-Description: Provides tools for training and evaluating neural networks tailored 
-    to the estimation of the mean and tImports:
-    rglhe standard deviation of a target variable. 
-    Includes a neural network with hidden layers adjustable in size and number, 
-    a neural additive model based on Thielmann et al. (2024), as well as functions
-    for data preparation and model evaluation.
+Description: Implementation of deep neural networks and 
+    extensions for heteroscedastic regression (NAMLSS). Includes tools for 
+    data preprocessing, batch loading, and model training with SGD/Adam optimizers.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -20,4 +17,7 @@ Depends:
     R (>= 3.5)
 Imports: rgl
 LazyData: true
-
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
