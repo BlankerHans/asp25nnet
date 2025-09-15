@@ -1,7 +1,81 @@
-#' Data Preprocessing Functions
-#' This script contains functions for data preprocessing steps described by
-#' Thielmann et al. (2020), including scaling to [-1, 1] and standard normalizing
-#' of target variables.
+#' Data preprocessing utilities (Thielmann et al., 2020)
+#'
+#' A compact set of helper functions for common preprocessing steps:
+#' scaling features to the interval \code{[-1, 1]}, standardizing target
+#' variables using training statistics, one-hot encoding of categorical
+#' features, and preserving dummy (0/1) columns during scaling.
+#'
+#' @details
+#' **Scaling to \code{[-1, 1]}**
+#'
+#' \itemize{
+#'   \item \code{pm1_scaler(X_train, eps)} estimates per-feature minima
+#'     \eqn{a_j} and maxima \eqn{b_j} on the training split.
+#'   \item \code{transform_pm1(X, scaler, clip)} applies the linear mapping
+#'     \eqn{z_j = 2\,\frac{x_j - a_j}{\max(b_j - a_j, 1)} - 1}. Constant
+#'     columns (\eqn{a_j = b_j}) are set exactly to \eqn{0}. Columns are
+#'     aligned to the training order; optional clipping confines outputs to
+#'     \code{[-1, 1]} for validation/test data.
+#' }
+#'
+#' **Target standardization**
+#'
+#' \itemize{
+#'   \item \code{normalize_targets(train, val, test)} returns standardized
+#'     targets using mean and standard deviation estimated on \emph{training}
+#'     only; aborts if the training standard deviation is \eqn{0} or \code{NA}.
+#'   \item \code{inverse_target(t\_std, mean, sd)} back-transforms via
+#'     \eqn{\text{mean} + \text{sd} \times t_{\text{std}}}.
+#' }
+#'
+#' **Categorical encoding**
+#'
+#' \itemize{
+#'   \item \code{one_hot_encode(data, cat_cols, ordered_levels, drop_first)}
+#'     creates dummy variables per categorical column using
+#'     \code{model.matrix(~ col - 1)}; numeric columns are kept unchanged.
+#'     Optionally drops the first level per column to avoid redundancy.
+#' }
+#'
+#' **Dummy handling with scaling**
+#'
+#' \itemize{
+#'   \item \code{detect_dummy_cols(df)} detects columns that contain only
+#'     \code{0}/\code{1} (allowing \code{NA}) and thus represent existing
+#'     binary indicators.
+#'   \item \code{dummy_pm1_wrapper(X, scaler, dummy_cols, clip)} scales
+#'     continuous features via \code{transform_pm1()} and then restores the
+#'     specified dummy columns from the original \code{X} so that binary
+#'     indicators remain intact.
+#' }
+#'
+#' @section Notes:
+#' \itemize{
+#'   \item All parameters for scaling/standardization are estimated on the
+#'     training split and reused for validation/test to prevent leakage.
+#'   \item \code{transform_pm1()} aligns columns to the training order; missing
+#'     training columns are created as \code{NA} before transformation; unknown
+#'     columns are ignored.
+#'   \item \code{one_hot_encode()} converts character columns to \code{factor}
+#'     automatically; supply \code{ordered_levels} for reproducible level order.
+#' }
+#'
+#' @references
+#' Thielmann, A., et al. (2020).
+#'
+#' @aliases
+#' pm1_scaler
+#' transform_pm1
+#' normalize_targets
+#' inverse_target
+#' one_hot_encode
+#' detect_dummy_cols
+#' dummy_pm1_wrapper
+#'
+#' @keywords preprocessing normalization scaling encoding
+#' @name data_preprocessing
+#' @md
+NULL
 
 # --- Scaling [-1, 1] ----------------------------------------------------
 

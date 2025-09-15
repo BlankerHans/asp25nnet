@@ -40,8 +40,7 @@ on the mean and standard deviation of the training set.
 \examples{
 \dontrun{
   data(iris)
-  result <- train_val_test(iris[, 1:4], split = c(0.7, 0.15, 0.15), normalization = TRUE)
-  str(result)
+  result <- random_split(iris, split = c(0.7, 0.15, 0.15), normalization = TRUE)
 }
 
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/init_namls_params.R
 \name{init_namls_params}
 \alias{init_namls_params}
-\title{Initialize NAMLSS Parameters}
+\title{Initialize NAMLS Parameters}
 \usage{
 init_namls_params(
   n_features,
@@ -14,20 +14,22 @@ init_namls_params(
 )
 }
 \arguments{
-\item{n_features}{Anzahl der Input-Features (J)}
+\item{n_features}{number of input features (J)}
 
-\item{hidden_neurons}{Vector der Hidden Layer Größen, z.B. c(250, 50, 25)}
+\item{hidden_neurons}{hidden layer architecture, z.B. c(250, 50, 25)}
 
 \item{y_mean}{mean of target (for numerical stability)}
 
 \item{y_sd}{sd of target (for numerical stability)}
 
-\item{sgima0}{Initial guess for sigma (for numerical stability)}
+\item{sigma0}{Initial guess for sigma (for numerical stability)}
+
+\item{seed}{seed setting ( default is 42)}
 }
 \value{
-Liste mit initialisierten Parametern für alle J Subnetzwerke
+A list containing the initialized parameters for all J sub networks
 }
 \description{
-Initialisiert NAMLSS mit J Subnetzwerken (eins pro Feature),
-jedes mit 2-dimensionalem Output (für mu und sigma)
+Initializes NAMLS with J sub networks (one per feature),
+each with a two-dimensional output (mu and sigma)
 }

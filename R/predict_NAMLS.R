@@ -1,6 +1,15 @@
+#' Predict method for NAMLS objects
+#'
+#' @param object A NAMLS object.
+#' @param newdata Optional data frame with new observations.
+#' @param type Character, one of \code{c("link","response")}.
+#' @param return_contributions Logical; if \code{TRUE}, also return contributions.
+#' @param ... Further arguments (ignored), kept for generic consistency.
+#' @return A numeric vector or data.frame with predictions.
 #' @export
-predict.NAMLS <- function(object, newdata, type = c("response", "link"),
-                          return_contributions = FALSE) {
+#' @importFrom stats predict
+predict_namls <- function(object, newdata, type = c("response", "link"),
+                          return_contributions = FALSE, ...) {
   type <- match.arg(type)
 
   # 1) Feature-Preprocessing wie im Training

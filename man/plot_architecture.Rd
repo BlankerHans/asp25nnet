@@ -6,6 +6,12 @@
 \usage{
 plot_architecture(model)
 }
+\arguments{
+\item{model}{trained DNN model}
+}
+\value{
+network architecture
+}
 \description{
-Plots architecture for DNN (NN class)
+Helper function to plot the model architecture after training
 }

@@ -7,14 +7,17 @@ Authors@R:
     person("Florian", "Penzkofer", email = "florian.penzkofer@stud.uni-goettingen.de", role = "aut")
     )
 Description: Provides tools for training and evaluating neural networks tailored 
-    to the estimation of the mean and the standard deviation of a target variable. 
+    to the estimation of the mean and tImports:
+    rglhe standard deviation of a target variable. 
     Includes a neural network with hidden layers adjustable in size and number, 
     a neural additive model based on Thielmann et al. (2024), as well as functions
     for data preparation and model evaluation.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends: 
     R (>= 3.5)
+Imports: rgl
 LazyData: true
+

@@ -152,9 +152,9 @@ n_inputs <- length(input_vars)
 
 insurance_loader <- DataLoader(train_insurance, batch_size = 256)
 
-nam_insurance <- train_namls(insurance_loader, targets_std_full, length(input_vars),  c(32, 64), t(val_insurance), val_targets_insurance,
-                           optimizer="adam", epochs=2000, lr=1e-04,
-                           dropout_rate=0.1, lr_decay=0.95, lr_patience=10, es_patience=50)
+nam_insurance <- train_namls(insurance_loader, targets_std_full, length(input_vars),  c(64), t(val_insurance), val_targets_insurance,
+                           optimizer="adam", epochs=2000, lr=1e-03,
+                           dropout_rate=0.5, lr_decay=0.5, lr_patience=10, es_patience=100)
 
 summary.NAMLS(nam_insurance,
               data = insurance_enc,             # DataFrame mit x-Spalten + Zielspalte
@@ -170,4 +170,4 @@ summary.NAMLS(nam_insurance,
               feature_plots = TRUE,  # partielle Effektplots bei >1 Features
               max_features = n_inputs,
               ci_z = 1.96)
-
+#

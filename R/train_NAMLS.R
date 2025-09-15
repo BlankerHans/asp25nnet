@@ -20,7 +20,7 @@
 #' @param es_min_delta Improvement Criterion (Default 0)
 #' @param es_warmup Epoch when early stopping should start (Default 50)
 #' @param restore_best_weights Do you want to store best weights? (Default TRUE)
-#' @return Trainiertes Modell
+#' @return Trained model
 #' @export
 train_namls <- function(train_loader, targets, n_features,
                          hidden_neurons = c(250, 50, 25),

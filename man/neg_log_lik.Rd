@@ -17,6 +17,8 @@ neg_log_lik(y, mu, log_sigma, reduction = c("sum", "mean", "raw"), eps = 1e-06)
 \code{"sum"} (default) returns the sum of individual losses,
 \code{"mean"} returns their mean,
 \code{"raw"} returns the vector of individual loss values.}
+
+\item{eps}{Value for numeric stability (default = 1e-6)}
 }
 \value{
 A numeric scalar or vector of negative log-likelihood values,
@@ -27,11 +29,9 @@ Computes the negative log-likelihood of observations \code{y} assuming a normal
 distribution with mean \code{mu} and log standard deviation \code{log_sigma}.
 }
 \details{
-For each observation \( y_i \), the function calculates the term:
-[
-\log(\sigma) + \frac{(y_i - \mu_i)^2}{2 \sigma^2}
-]
-where \(\sigma = \exp(\text{log_sigma})\).
+For each observation y_i, the function calculates the term:
+\deqn{\log(\sigma) + \frac{(y_i - \mu_i)^2}{2 \sigma^2}}
+where \eqn{\sigma = \exp(\text{log_sigma})}.
 The result is then aggregated based on the \code{reduction} argument.
 }
 \examples{

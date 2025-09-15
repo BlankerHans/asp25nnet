@@ -9,6 +9,7 @@
 #'   epochs, losses, and training information.
 #' @param data Data frame used for model evaluation, including predictors and target.
 #' @param target_col Character string with the name of the target variable.
+#' @param dummy_cols Optional character vector of column names that were one-hot encoded.
 #' @param pm1_scaler List containing feature scaling parameters from pm1_scaler() function,
 #'   with elements 'a' (min values), 'b' (max values), and 'eps'. If NULL, no feature
 #'   scaling is applied.
@@ -41,7 +42,7 @@
 #' norm_targets <- normalize_targets(train_targets)
 #'
 #' # Summary with preprocessing info
-#' summary_NAMLS(
+#' summary_namls(
 #'   object = model,
 #'   data = test_data,
 #'   target_col = "y",
@@ -52,7 +53,7 @@
 #' }
 #'
 #' @export
-summary_NAMLS <- function(object,
+summary_namls <- function(object,
                           data,
                           target_col,
                           dummy_cols = NULL,
