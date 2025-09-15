@@ -23,12 +23,12 @@
 #'
 #' @examples
 #' \dontrun{
-#'   evaluation <- eval.DNN(model, split_output, verbose = TRUE)
+#'   evaluation <- eval_DNN(model, split_output, verbose = TRUE)
 #'}
 #'
 #' @export
 
-eval.DNN <- function(object, split_output, verbose = TRUE) {
+eval_DNN <- function(object, split_output, verbose = TRUE) {
 
   params <- object$params
 
@@ -65,7 +65,7 @@ eval.DNN <- function(object, split_output, verbose = TRUE) {
   cat(sprintf("95%% coverage: %.3f\n", cover))
   }
 
-  return(list(
+  invisible(list(
     fwd = fwd,
     loss = loss,
     mu = mu,
