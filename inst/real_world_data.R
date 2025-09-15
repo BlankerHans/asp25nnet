@@ -68,12 +68,12 @@ n_inputs <- length(input_vars)
 ca_housing_loader <- DataLoader(train_ca_housing, batch_size = 256)
 
 nam_housing <- train_namls(ca_housing_loader, targets_std_full, length(input_vars),  c(32, 64, 128, 256), t(val_ca_housing), val_targets_ca_housing,
-                             optimizer="adam", epochs=2000, lr=1e-03,
+                             optimizer="adam", epochs=1, lr=1e-03,
                              dropout_rate=0.1, lr_decay=0.95, lr_patience=10, es_patience=100)
 
 
 
-summary.NAMLS(nam_housing,
+summary_namls(nam_housing,
                data = ca_housing,             # DataFrame mit x-Spalten + Zielspalte
                target_col = "target", # Name der Zielspalte
                pm1_scaler = pm1,        # für [-1, 1] Skalierung
@@ -163,7 +163,7 @@ nam_insurance <- train_namls(insurance_loader, targets_std_full, length(input_va
                            optimizer="adam", epochs=2000, lr=1e-03,
                            dropout_rate=0.5, lr_decay=0.5, lr_patience=10, es_patience=100)
 
-summary.NAMLS(nam_insurance,
+summary_namlsS(nam_insurance,
               data = insurance_enc,             # DataFrame mit x-Spalten + Zielspalte
               target_col = "charges", # Name der Zielspalte
               dummy_cols = dummy_cols,
